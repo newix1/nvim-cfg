@@ -2,6 +2,20 @@
 
 require('vim._core.ui2').enable()
 
+local g = vim.g
+
+g.clipboard = {
+	name = "OSC 52",
+	copy = {
+		["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+		["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+	},
+	paste = {
+		["+"] = require("vim.ui.clipboard.osc52").paste("+"),
+		["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+	},
+}
+
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
@@ -42,7 +56,10 @@ local opt = vim.opt
 opt.autowrite = true -- Enable auto write
 -- only set clipboard if not in ssh, to make sure the OSC 52
 -- integration works automatically.
-opt.clipboard = vim.env.SSH_CONNECTION and "" or "unnamedplus" -- Sync with system clipboard
+-- ----------------------------------------------------------------------------------------------------------------
+-- opt.clipboard = vim.env.SSH_CONNECTION and "" or "unnamedplus" -- Sync with system clipboard (OSC 52 not works)
+-- ----------------------------------------------------------------------------------------------------------------
+opt.clipboard = "unnamedplus" -- Sync with system clipboard (OSC 52)
 opt.completeopt = "menu,menuone,noselect"
 opt.conceallevel = 2 -- Hide * markup for bold and italic, but not markers with substitutions
 opt.confirm = true -- Confirm to save changes before exiting modified buffer
