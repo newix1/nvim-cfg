@@ -19,9 +19,25 @@ vim.pack.add({
   { src = "https://github.com/sindrets/diffview.nvim" },
 })
 
+vim.pack.add({
+  { src = "https://github.com/esmuellert/codediff.nvim"},
+})
+
+vim.pack.add({
+  { src = "https://github.com/lionyxml/gitlineage.nvim"},
+})
+
+require("gitlineage").setup ()
+
 require("neogit").setup ()
 
 require('gitsigns').setup {
+  current_line_blame = true,
+  current_line_blame_opts = {
+    virt_text = true,
+    virt_text_pos = 'eol',
+    delay = 200, -- мс перед показом
+  },
   signs = {
     add = { text = "▎" },
     change = { text = "▎" },

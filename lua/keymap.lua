@@ -21,6 +21,41 @@ map("n", "<C-j>", "<C-w>j", { desc = "Go to Lower Window", remap = true })
 map("n", "<C-k>", "<C-w>k", { desc = "Go to Upper Window", remap = true })
 map("n", "<C-l>", "<C-w>l", { desc = "Go to Right Window", remap = true })
 
+vim.keymap.set('n', '<leader>gd', function()
+  local file = vim.api.nvim_buf_get_name(0)
+  if file == '' then return vim.notify('Сначала сохраните файл', vim.log.levels.WARN) end
+
+  local line = vim.api.nvim_win_get_cursor(0)[1]
+  local blame_cmd = string.format("git blame -L %d,%d --porcelain -- %s", line, line, vim.fn.shellescape(file))
+  local blame_out = vim.fn.system(blame_cmd)
+  if vim.v.shell_error ~= 0 then
+    return vim.notify('git blame failed: ' .. blame_out:gsub('\n', ' '), vim.log.levels.ERROR)
+  end
+
+  local full_hash = blame_out:match('^(%x+)')
+  if not full_hash then
+    return vim.notify('Строка ещё не закоммичена или файл не в git', vim.log.levels.INFO)
+  end
+
+  -- Получаем короткий хэш + заголовок коммита
+  local log_cmd = string.format('git log -1 --format="%%h %%s" %s', full_hash)
+  local log_out = vim.fn.system(log_cmd):gsub('\n$', '')
+
+  if log_out ~= '' then
+    vim.notify('🔍 ' .. log_out, vim.log.levels.INFO)
+    local short_hash = log_out:match('^([^%s]+)')
+    vim.cmd('DiffviewOpen ' .. short_hash .. '^!')
+  else
+    -- Fallback для shallow-репозиториев или если git log не ответил
+    vim.notify('⚠️ Заголовок не получен, открываю по полному хэшу', vim.log.levels.WARN)
+    vim.cmd('DiffviewOpen ' .. full_hash .. '^!')
+  end
+end, { desc = 'Diffview: коммит строки (с заголовком)' })
+
+vim.keymap.set('n', '<leader>gf', '<cmd>DiffviewFileHistory %<CR>', { desc = 'История текущего файла' })
+
+vim.keymap.set('n', '<leader>gs', '<cmd>DiffviewOpen<CR>', { desc = 'Staged/Unstaged diff' })
+
 -- Resize window using <ctrl> arrow keys
 map("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase Window Height" })
 map("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease Window Height" })
