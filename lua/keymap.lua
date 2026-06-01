@@ -122,6 +122,14 @@ map({ "n", "x" }, "<leader>cf", function()
   LazyVim.format({ force = true })
 end, { desc = "Format" })
 
+map('n', '<leader>rn', function()
+    vim.lsp.buf.rename()
+end, { silent = true, desc = 'LSP: Rename symbol' })
+
+map('n', '<leader>gr', function()
+  vim.lsp.buf.references({ includeDeclaration = false })
+end, { silent = true, desc = 'LSP: Найти все вызовы' })
+
 -- diagnostic
 local diagnostic_goto = function(next, severity)
   return function()
