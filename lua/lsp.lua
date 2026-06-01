@@ -5,6 +5,7 @@ vim.lsp.enable({
   "elp",
   "vue_ls",
   "vtsls",
+  "ocamllsp",
 })
 
 vim.diagnostic.config({ virtual_text = true })

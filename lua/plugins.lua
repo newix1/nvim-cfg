@@ -11,6 +11,16 @@ vim.pack.add({
   { src = "https://github.com/lewis6991/gitsigns.nvim" },
 })
 
+vim.pack.add({
+  { src = "https://github.com/neogitorg/neogit" },
+})
+
+vim.pack.add({
+  { src = "https://github.com/sindrets/diffview.nvim" },
+})
+
+require("neogit").setup ()
+
 require('gitsigns').setup {
   signs = {
     add = { text = "▎" },
@@ -79,7 +89,7 @@ vim.pack.add({
   { src = "https://github.com/m4xshen/hardtime.nvim" },
 })
 
-require("hardtime").setup()
+-- require("hardtime").setup()
 
 vim.pack.add({
     { src = "https://github.com/saghen/blink.cmp", version = vim.version.range("^1") },
