@@ -23,6 +23,14 @@ vim.pack.add({
   { src = "https://github.com/lionyxml/gitlineage.nvim"},
 })
 
+vim.pack.add({
+  { src = "https://github.com/iberianpig/tig-explorer.vim"},
+})
+
+vim.pack.add({
+  { src = "https://github.com/rbgrouleff/bclose.vim"},
+})
+
 require("gitlineage").setup ()
 
 require("neogit").setup ()

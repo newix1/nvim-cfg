@@ -52,6 +52,8 @@ vim.keymap.set('n', '<leader>gf', '<cmd>DiffviewFileHistory %<CR>', { desc = 'И
 
 vim.keymap.set('n', '<leader>gs', '<cmd>DiffviewOpen<CR>', { desc = 'Staged/Unstaged diff' })
 
+vim.keymap.set('n', '<leader>gg', '<cmd>Tig<CR>', { desc = 'Open Tig' })
+
 -- Resize window using <ctrl> arrow keys
 map("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase Window Height" })
 map("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease Window Height" })
