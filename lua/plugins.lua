@@ -4,6 +4,12 @@ vim.pack.add({
 })
 
 vim.pack.add({
+  { src = 'https://github.com/RRethy/base16-nvim' },
+})
+
+require("matugen").setup ()
+
+vim.pack.add({
   { src = "https://github.com/lewis6991/gitsigns.nvim" },
 })
 
