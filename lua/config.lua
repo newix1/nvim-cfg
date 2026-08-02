@@ -47,6 +47,89 @@ require('vim._core.ui2').enable({
   },
 })
 
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "go",
+  callback = function()
+    vim.opt_local.list = false
+  end,
+})
+
+-- winbar показывает текущую функцию/класс через LSP (асинхронно)
+vim.opt.winbar = "%{%v:lua.WinBar()%}"
+
+-- Кеш для winbar
+local winbar_cache = {}
+
+function WinBar()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local row = vim.api.nvim_win_get_cursor(0)[1] - 1
+
+  -- Проверяем кеш (если есть и совпадает строка)
+  if winbar_cache[bufnr] and winbar_cache[bufnr].row == row then
+    return winbar_cache[bufnr].text
+  end
+
+  -- Проверяем, есть ли LSP-клиент
+  local clients = vim.lsp.get_clients({ bufnr = bufnr })
+  if #clients == 0 then
+    winbar_cache[bufnr] = { row = row, text = "" }
+    return ""
+  end
+
+  -- Асинхронный запрос к LSP
+  local params = { textDocument = { uri = vim.uri_from_bufnr(bufnr) } }
+  vim.lsp.buf_request(bufnr, "textDocument/documentSymbol", params, function(err, result)
+    if err or not result then
+      winbar_cache[bufnr] = { row = row, text = "" }
+      vim.cmd("redrawstatus")
+      return
+    end
+
+    local symbols = result
+    if not symbols or #symbols == 0 then
+      winbar_cache[bufnr] = { row = row, text = "" }
+      vim.cmd("redrawstatus")
+      return
+    end
+
+    -- Рекурсивно собираем все символы
+    local function flatten_symbols(sym_list, acc)
+      acc = acc or {}
+      for _, sym in ipairs(sym_list) do
+        table.insert(acc, sym)
+        if sym.children then
+          flatten_symbols(sym.children, acc)
+        end
+      end
+      return acc
+    end
+
+    local flat_symbols = flatten_symbols(symbols)
+
+    -- Ищем символ, содержащий текущую строку
+    local current_symbol = nil
+    for _, sym in ipairs(flat_symbols) do
+      local range = sym.range or sym.selectionRange
+      if range and range.start.line <= row and range["end"].line >= row then
+        current_symbol = sym
+        break
+      end
+    end
+
+    if current_symbol then
+      winbar_cache[bufnr] = { row = row, text = "  " .. current_symbol.name }
+    else
+      winbar_cache[bufnr] = { row = row, text = "" }
+    end
+
+    -- Обновляем статусную строку, чтобы отобразить winbar
+    vim.cmd("redrawstatus")
+  end)
+
+  -- Пока LSP не ответил, показываем пустую строку
+  return ""
+end
+
 vim.opt.completeopt:append("popup")
 local progress = vim.ui.progress_status()
 

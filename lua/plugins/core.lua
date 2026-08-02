@@ -706,3 +706,134 @@ require("tiny-glimmer").setup({
 local map = vim.keymap.set
 map("n", "<Leader>ge", "<Cmd>TinyGlimmer enable<CR>", { desc = "Enable animations" })
 map("n", "<Leader>gd", "<Cmd>TinyGlimmer disable<CR>", { desc = "Disable animations" })
+
+---------------------------------------------------------------------
+----------------------------- nvim-ufo ------------------------------
+---------------------------------------------------------------------
+
+vim.pack.add({
+  { src = "https://github.com/kevinhwang91/nvim-ufo" },
+  { src = "https://github.com/kevinhwang91/promise-async" },
+})
+
+-- Базовые настройки фолдинга для Neovim
+vim.o.fillchars = 'eob: ,fold: ,foldopen:,foldsep: ,foldinner: ,foldclose:'
+vim.opt.foldcolumn = "1"     -- показывать столбец для фолдов
+vim.opt.foldlevel = 99       -- все блоки развёрнуты по умолчанию
+vim.opt.foldlevelstart = 99  -- при открытии файла все развёрнуто
+vim.opt.foldenable = true    -- фолдинг включён
+
+-- Настройка ufo
+require("ufo").setup({
+  -- Провайдеры: сначала LSP (самый точный), потом Treesitter, потом indent
+  provider_selector = function(bufnr, filetype, buftype)
+    return { "treesitter", "indent" }
+  end,
+})
+
+-- === Бинды для управления фолдами ===
+
+local map = vim.keymap.set
+
+-- Развернуть/свернуть всё
+map("n", "zR", require("ufo").openAllFolds, { desc = "Open all folds" })
+map("n", "zM", require("ufo").closeAllFolds, { desc = "Close all folds" })
+map("n", "zr", require("ufo").openFoldsExceptKinds, { desc = "Open folds except kinds" })
+map("n", "zm", require("ufo").closeFoldsWith, { desc = "Close folds" })
+
+-- Предпросмотр свёрнутого блока (K по умолчанию, но у тебя K занят под LSP hover)
+-- Можно переназначить на другую клавишу или оставить как есть
+map("n", "<Leader>fp", function()
+  local winid = require("ufo").peekFoldedLinesUnderCursor()
+  if not winid then
+    -- fallback на стандартный LSP hover (если надо)
+    vim.lsp.buf.hover()
+  end
+end, { desc = "Peek folded lines" })
+
+
+---------------------------------------------------------------------
+--------------------------- neoscroll -------------------------------
+---------------------------------------------------------------------
+
+vim.pack.add({
+  { src = "https://github.com/karb94/neoscroll.nvim" },
+})
+
+require("neoscroll").setup({
+  -- Скрывать курсор во время скролла (приятный эффект)
+  hide_cursor = true,
+
+  -- Останавливаться в конце файла
+  stop_eof = true,
+
+  -- Уважать `scrolloff` (чтобы не упираться в край)
+  respect_scrolloff = false,
+
+  -- Прокручивать курсор, даже если окно не может прокрутиться дальше
+  cursor_scrolls_alone = true,
+
+  -- Глобальный множитель длительности анимации
+  duration_multiplier = 1.0,
+
+  -- Тип анимации по умолчанию
+  easing = "sine",
+
+  -- Маппинги, которые будут переопределены
+  mappings = {
+    "<C-u>",
+    "<C-d>",
+    "<C-b>",
+    "<C-f>",
+    "<C-y>",
+    "<C-e>",
+    "zt",
+    "zz",
+    "zb",
+  },
+
+  -- Отключаем производительность (она не нужна на современных машинах)
+  performance_mode = false,
+})
+
+-- Кастомные маппинги с разной длительностью для разных действий
+local neoscroll = require("neoscroll")
+local map = vim.keymap.set
+local modes = { "n", "v", "x" }
+
+-- Настройка плавности для каждой команды
+map(modes, "<C-u>", function()
+  neoscroll.ctrl_u({ duration = 250, easing = "sine" })
+end, { desc = "Smooth scroll up" })
+
+map(modes, "<C-d>", function()
+  neoscroll.ctrl_d({ duration = 250, easing = "sine" })
+end, { desc = "Smooth scroll down" })
+
+map(modes, "<C-b>", function()
+  neoscroll.ctrl_b({ duration = 450, easing = "circular" })
+end, { desc = "Smooth page up" })
+
+map(modes, "<C-f>", function()
+  neoscroll.ctrl_f({ duration = 450, easing = "circular" })
+end, { desc = "Smooth page down" })
+
+map(modes, "<C-y>", function()
+  neoscroll.scroll(-0.1, { move_cursor = false, duration = 100 })
+end, { desc = "Smooth scroll line up" })
+
+map(modes, "<C-e>", function()
+  neoscroll.scroll(0.1, { move_cursor = false, duration = 100 })
+end, { desc = "Smooth scroll line down" })
+
+map("n", "zt", function()
+  neoscroll.zt({ half_win_duration = 250 })
+end, { desc = "Smooth zt" })
+
+map("n", "zz", function()
+  neoscroll.zz({ half_win_duration = 250 })
+end, { desc = "Smooth zz" })
+
+map("n", "zb", function()
+  neoscroll.zb({ half_win_duration = 250 })
+end, { desc = "Smooth zb" })

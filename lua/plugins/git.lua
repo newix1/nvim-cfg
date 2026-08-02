@@ -17,8 +17,34 @@ vim.pack.add({
 })
 
 require("gitsigns").setup({
+    signs = {
+    -- Настройка знаков для изменённых файлов
+    add          = { text = "│" },
+    change       = { text = "│" },
+    delete       = { text = "│" },
+    topdelete    = { text = "│" },
+    changedelete = { text = "│" },
+    untracked    = { text = "│" },
+  },
+  signs_staged = {
+    -- Знаки для проиндексированных (staged) изменений
+    add          = { text = "│" },
+    change       = { text = "│" },
+    delete       = { text = "│" },
+    topdelete    = { text = "│" },
+    changedelete = { text = "│" },
+    untracked    = { text = "│" },
+  },
+  signs_staged_enable = true,
 	current_line_blame = true,
 })
+
+vim.api.nvim_set_hl(0, "GitSignsAdd", { fg = "#98c379" })    -- Зелёный
+vim.api.nvim_set_hl(0, "GitSignsChange", { fg = "#e5c07b" }) -- Жёлтый
+vim.api.nvim_set_hl(0, "GitSignsDelete", { fg = "#e06c75" }) -- Красный
+vim.api.nvim_set_hl(0, "GitSignsAddNr", { fg = "#98c379" })   -- Зелёный для номеров строк
+vim.api.nvim_set_hl(0, "GitSignsChangeNr", { fg = "#e5c07b" })-- Жёлтый для номеров строк
+vim.api.nvim_set_hl(0, "GitSignsDeleteNr", { fg = "#e06c75" })-- Красный для номеров строк
 
 local gitsigns = require("gitsigns")
 
@@ -222,4 +248,4 @@ vim.pack.add({
 	{ src = "https://github.com/iberianpig/tig-explorer.vim" },
 })
 
-vim.keymap.set('n', '<leader>gg', '<cmd>Tig<CR>', { desc = 'Open Tig' })
+vim.keymap.set('n', '<leader>gG', '<cmd>Tig<CR>', { desc = 'Open Tig' })
