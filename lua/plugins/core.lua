@@ -13,11 +13,11 @@ vim.pack.add({
   gh("goolord/alpha-nvim"),
 })
 
-local startify = require("alpha.themes.startify")
-startify.file_icons.provider = "devicons"
-require("alpha").setup(
-  startify.config
-)
+-- local startify = require("alpha.themes.startify")
+-- startify.file_icons.provider = "devicons"
+-- require("alpha").setup(
+--   startify.config
+-- )
 
 vim.o.cmdheight =0
 vim.pack.add({ "https://github.com/rachartier/tiny-cmdline.nvim" })
