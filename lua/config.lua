@@ -215,6 +215,14 @@ vim.api.nvim_create_autocmd("FocusGained", {
   end,
 })
 
+-- Сохранять файл после undo
+vim.api.nvim_create_autocmd("User", {
+  pattern = "UndoRedo",
+  callback = function()
+    vim.cmd("silent! wall") -- сохранить все изменённые буферы
+  end,
+})
+
 -- g.clipboard = {
 -- 	name = "OSC 52",
 -- 	copy = {

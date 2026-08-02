@@ -191,7 +191,7 @@ map('n', '<leader>gd', function()
 end, { desc = 'Line commit blame (CodeDiff)' })
 
 -- Открыть Git статус (эксплорер)
-map("n", "<Leader>gd", "<Cmd>CodeDiff<CR>", { desc = "Codediff: Git status" })
+map("n", "<Leader>gs", "<Cmd>CodeDiff<CR>", { desc = "Codediff: Git status" })
 
 -- === История файла ===
 

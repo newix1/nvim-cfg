@@ -53,12 +53,16 @@ vim.api.nvim_create_autocmd('PackChanged', {
   end,
 })
 
-vim.g.fff = {
-  lazy_sync = true,
-  debug = { enabled = true, show_scores = true },
-}
 
 local fff = require("fff")
+
+fff.setup ({
+  layout ={
+    prompt_position = 'top',
+    width = 0.6,
+    height = 0.6
+  }
+})
 
 -- Поиск файлов
 map("n", "<Leader><Leader>", function()
