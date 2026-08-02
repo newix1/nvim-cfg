@@ -1,8 +1,136 @@
 -- This file is automatically loaded after init.lua
 
-require('vim._core.ui2').enable()
+require('vim._core.ui2').enable({
+  enable = true,
+  msg = {
+    targets = {
+      [''] = 'msg',            -- Сообщения по умолчанию
+      empty = 'cmd',           -- Пустые сообщения
+      bufwrite = 'msg',        -- <--- Запись файла → в msg (не в cmd)
+      confirm = 'cmd',         -- Подтверждения
+      emsg = 'pager',          -- Ошибки → pager
+      echo = 'msg',            -- Обычные сообщения → msg
+      echomsg = 'msg',         -- Сообщения → msg
+      echoerr = 'pager',       -- Ошибки → pager
+      completion = 'cmd',      -- Дополнение → cmd
+      list_cmd = 'pager',      -- Списки → pager
+      lua_error = 'pager',     -- Ошибки Lua → pager
+      lua_print = 'msg',       -- print() → msg
+      progress = 'pager',      -- Прогресс → pager
+      rpc_error = 'pager',     -- Ошибки RPC → pager
+      quickfix = 'msg',        -- Quickfix → msg
+      search_cmd = 'cmd',      -- Поиск → cmd
+      search_count = 'cmd',    -- Счётчик поиска → cmd
+      shell_cmd = 'pager',     -- Команды шелла → pager
+      shell_err = 'pager',     -- Ошибки шелла → pager
+      shell_out = 'pager',     -- Вывод шелла → pager
+      shell_ret = 'msg',       -- Возврат шелла → msg
+      undo = 'msg',            -- Отмена → msg
+      verbose = 'pager',       -- Вербоз → pager
+      wildlist = 'cmd',        -- Список wildcard → cmd
+      wmsg = 'msg',            -- Сообщения → msg
+      typed_cmd = 'msg',       -- Введённые команды → cmd
+    },
+    cmd = {
+      height = 0.5,            -- Для поиска и команд
+    },
+    dialog = {
+      height = 0.5,            -- Для диалогов
+    },
+    msg = {
+      height = 0.3,            -- Окошко для сообщений (не перекрывает lualine)
+      timeout = 3000,          -- Исчезает через 3 секунды
+    },
+    pager = {
+      height = 0.5,            -- Для длинных сообщений
+    },
+  },
+})
+
+vim.opt.completeopt:append("popup")
+local progress = vim.ui.progress_status()
 
 local g = vim.g
+
+-- Возвращать курсор на последнюю позицию при открытии файла
+vim.api.nvim_create_autocmd("BufReadPost", {
+  callback = function()
+    local mark = vim.api.nvim_buf_get_mark(0, '"')
+    local lcount = vim.api.nvim_buf_line_count(0)
+    if mark[1] > 0 and mark[1] <= lcount then
+      pcall(vim.api.nvim_win_set_cursor, 0, mark)
+    end
+  end,
+})
+
+---------------------------------------------------------------------
+------------------- Highlight Trailing Whitespace -------------------
+---------------------------------------------------------------------
+
+-- 1. Создаём группу подсветки (красный фон)
+vim.api.nvim_set_hl(0, "TrailingWhitespace", { bg = "#ff0000" })
+
+-- 2. Функция для включения подсветки
+local function enable_trailing_whitespace_highlight()
+  local filetype = vim.bo.filetype
+  local code_filetypes = {
+    "lua", "python", "c", "cpp", "rust", "go", "javascript",
+    "typescript", "java", "ruby", "php", "sh", "bash", "zsh",
+    "vim", "toml", "yaml", "json", "html", "css", "scss",
+  }
+
+  -- Удаляем старый матч, если был
+  pcall(vim.cmd, "match none")
+
+  -- Включаем для кода
+  if vim.tbl_contains(code_filetypes, filetype) then
+    vim.cmd("match TrailingWhitespace /\\s\\+$/")
+  end
+end
+
+-- 3. Автоматически применяем при открытии файлов и при изменении типа
+vim.api.nvim_create_autocmd({ "BufEnter", "BufReadPost", "FileType" }, {
+  callback = enable_trailing_whitespace_highlight,
+})
+
+-- 4. Для пустых буферов без типа — тоже выключаем
+vim.api.nvim_create_autocmd("BufNewFile", {
+  callback = function()
+    pcall(vim.cmd, "match none")
+  end,
+})
+
+---------------------------------------------------------------------
+------------------------- Auto-save ---------------------------------
+---------------------------------------------------------------------
+
+-- Сохранять при потере фокуса (переключился в браузер/терминал)
+vim.api.nvim_create_autocmd("FocusLost", {
+  callback = function()
+    vim.cmd("silent! wall")
+  end,
+})
+
+-- Сохранять при выходе из режима вставки (как в VS Code)
+vim.api.nvim_create_autocmd("InsertLeave", {
+  callback = function()
+    vim.cmd("silent! wall")
+  end,
+})
+
+-- Сохранять при переключении буферов
+vim.api.nvim_create_autocmd("BufLeave", {
+  callback = function()
+    vim.cmd("silent! wall")
+  end,
+})
+
+vim.opt.autoread = true
+vim.api.nvim_create_autocmd("FocusGained", {
+  callback = function()
+    vim.cmd("checktime")
+  end,
+})
 
 -- g.clipboard = {
 -- 	name = "OSC 52",
@@ -66,18 +194,17 @@ opt.confirm = true -- Confirm to save changes before exiting modified buffer
 opt.cursorline = true -- Enable highlighting of the current line
 opt.expandtab = true -- Use spaces instead of tabs
 opt.fillchars = {
-  foldopen = "",
-  foldclose = "",
-  fold = " ",
-  foldsep = " ",
-  diff = "╱",
-  eob = " ",
+	foldopen = "",
+	foldclose = "",
+	fold = " ",
+	foldsep = " ",
+	diff = "╱",
+	eob = " ",
 }
 opt.foldlevel = 99
 opt.foldmethod = "indent"
 opt.foldtext = ""
 opt.formatoptions = "jcroqlnt" -- tcqj
-opt.guicursor = "i:block"
 opt.grepformat = "%f:%l:%c:%m"
 opt.grepprg = "rg --vimgrep"
 opt.ignorecase = true -- Ignore case
@@ -97,8 +224,9 @@ opt.sessionoptions = { "buffers", "curdir", "tabpages", "winsize", "help", "glob
 opt.shiftround = true -- Round indent
 opt.shiftwidth = 2 -- Size of an indent
 opt.shortmess:append({ W = true, I = true, c = true, C = true })
-opt.showmode = false -- Dont show mode since we have a statusline
+vim.opt.showmode = false
 opt.sidescrolloff = 8 -- Columns of context
+opt.scrolloff = 8 -- Columns of context
 opt.signcolumn = "yes" -- Always show the signcolumn, otherwise it would shift the text each time
 opt.smartcase = true -- Don't ignore case with capitals
 opt.smartindent = true -- Insert indents automatically
@@ -109,14 +237,15 @@ opt.splitkeep = "screen"
 opt.splitright = true -- Put new windows right of current
 opt.tabstop = 2 -- Number of spaces tabs count for
 opt.termguicolors = true -- True color support
+vim.o.timeoutlen = 300
 opt.undofile = true
 opt.undolevels = 10000
 opt.updatetime = 200 -- Save swap file and trigger CursorHold
 opt.virtualedit = "block" -- Allow cursor to move where there is no text in visual block mode
 opt.wildmode = "longest:full,full" -- Command-line completion mode
+opt.winborder = 'rounded'
 opt.winminwidth = 5 -- Minimum window width
 opt.wrap = false -- Disable line wrap
 
 -- Fix markdown indentation settings
 vim.g.markdown_recommended_style = 0
-

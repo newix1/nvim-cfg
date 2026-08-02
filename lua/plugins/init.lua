@@ -1,0 +1,5 @@
+require("plugins/git")
+require("plugins/search")
+require("plugins/core")
+require("plugins/base16")
+require("plugins/editor")
