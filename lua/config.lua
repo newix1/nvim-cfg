@@ -184,45 +184,45 @@ vim.api.nvim_create_autocmd("BufNewFile", {
   end,
 })
 
----------------------------------------------------------------------
-------------------------- Auto-save ---------------------------------
----------------------------------------------------------------------
-
--- Сохранять при потере фокуса (переключился в браузер/терминал)
-vim.api.nvim_create_autocmd("FocusLost", {
-  callback = function()
-    vim.cmd("silent! wall")
-  end,
-})
-
--- Сохранять при выходе из режима вставки (как в VS Code)
-vim.api.nvim_create_autocmd("InsertLeave", {
-  callback = function()
-    vim.cmd("silent! wall")
-  end,
-})
-
--- Сохранять при переключении буферов
-vim.api.nvim_create_autocmd("BufLeave", {
-  callback = function()
-    vim.cmd("silent! wall")
-  end,
-})
-
-vim.opt.autoread = true
-vim.api.nvim_create_autocmd("FocusGained", {
-  callback = function()
-    vim.cmd("checktime")
-  end,
-})
-
--- Сохранять файл после undo
-vim.api.nvim_create_autocmd("User", {
-  pattern = "UndoRedo",
-  callback = function()
-    vim.cmd("silent! wall") -- сохранить все изменённые буферы
-  end,
-})
+-- ---------------------------------------------------------------------
+-- ------------------------- Auto-save ---------------------------------
+-- ---------------------------------------------------------------------
+--
+-- -- Сохранять при потере фокуса (переключился в браузер/терминал)
+-- vim.api.nvim_create_autocmd("FocusLost", {
+--   callback = function()
+--     vim.cmd("silent! wall")
+--   end,
+-- })
+--
+-- -- Сохранять при выходе из режима вставки (как в VS Code)
+-- vim.api.nvim_create_autocmd("InsertLeave", {
+--   callback = function()
+--     vim.cmd("silent! wall")
+--   end,
+-- })
+--
+-- -- Сохранять при переключении буферов
+-- vim.api.nvim_create_autocmd("BufLeave", {
+--   callback = function()
+--     vim.cmd("silent! wall")
+--   end,
+-- })
+--
+-- vim.opt.autoread = true
+-- vim.api.nvim_create_autocmd("FocusGained", {
+--   callback = function()
+--     vim.cmd("checktime")
+--   end,
+-- })
+--
+-- -- Сохранять файл после undo
+-- vim.api.nvim_create_autocmd("User", {
+--   pattern = "UndoRedo",
+--   callback = function()
+--     vim.cmd("silent! wall") -- сохранить все изменённые буферы
+--   end,
+-- })
 
 -- g.clipboard = {
 -- 	name = "OSC 52",

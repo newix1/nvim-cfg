@@ -181,11 +181,43 @@ map("n", "<leader>Z", function()
 end, { desc = "Toggle Zoom" })
 
 ---------------------------------------------------------------------
+--------------------------- LuaSnip ---------------------------------
+---------------------------------------------------------------------
+
+vim.pack.add({
+  { src = "https://github.com/L3MON4D3/LuaSnip" },
+  { src = "https://github.com/rafamadriz/friendly-snippets" },
+})
+
+-- Загружаем VS Code-сниппеты из friendly-snippets
+require("luasnip.loaders.from_vscode").load()
+
+-- Если нужно автоматическое расширение сниппетов без Tab
+-- require("luasnip").config.setup({
+--   enable_autosnippets = true,
+-- })
+
+-- -- Бинды для навигации по табстопам (если blink.cmp не справляется)
+-- local ls = require("luasnip")
+--
+-- vim.keymap.set({"i", "s"}, "<Tab>", function()
+--   if ls.expand_or_jumpable() then
+--     ls.expand_or_jump()
+--   end
+-- end, { silent = true })
+--
+-- vim.keymap.set({"i", "s"}, "<S-Tab>", function()
+--   if ls.jumpable(-1) then
+--     ls.jump(-1)
+--   end
+-- end, { silent = true })
+
+---------------------------------------------------------------------
 --------------------------- blink.cmp -------------------------------
 ---------------------------------------------------------------------
 
 vim.pack.add({
-  { src = gh("saghen/blink.cmp") },
+  { src = gh("saghen/blink.cmp"), version = 'v1.10.2' },
   { src = gh("saghen/blink.lib") },
   { src = gh("L3MON4D3/LuaSnip") }, -- для сниппетов
 })
@@ -231,8 +263,14 @@ local function get_kind_icon(ctx)
     local kind = ctx.kind or ""
     return { text = (icons[kind] or "󰠱") .. " ", highlight = ctx.kind_hl }
   end
-  return { text = "󰈙 ", highlight = ctx.kind_hl }
+  return { text = " ", highlight = ctx.kind_hl }
 end
+
+require("luasnip.loaders.from_vscode").load()
+
+require("luasnip").config.setup({
+  enable_autosnippets = true,
+})
 
 -- Настройка blink.cmp
 require("blink.cmp").setup({
@@ -851,3 +889,37 @@ navic.setup({
 
 -- Добавляем navic в winbar
 vim.opt.winbar = "%{%v:lua.require'nvim-navic'.get_location()%}"
+
+-- ---------------------------------------------------------------------
+-- --------------------------- auto-save --------------------------------
+-- ---------------------------------------------------------------------
+--
+-- vim.pack.add({
+--   { src = "https://github.com/okuuva/auto-save.nvim" },
+-- })
+--
+-- require("auto-save").setup({
+--   enabled = true,
+--
+--   -- События, при которых сохранять
+--   trigger_events = {
+--     immediate_save = {
+--       "FocusLost",    -- потеря фокуса окном
+--       "InsertLeave",  -- выход из режима вставки
+--       "BufLeave",     -- переключение буфера
+--     },
+--     defer_save = {},  -- отключаем отложенное сохранение
+--   },
+--
+--   -- Что НЕ сохранять
+--   condition = function(buf)
+--     local ft = vim.bo[buf].filetype
+--     local buftype = vim.bo[buf].buftype
+--
+--     -- Не сохранять терминалы, help, и некоторые специальные буферы
+--     if ft == "help" or ft == "terminal" or buftype == "nofile" or buftype == "nowrite" then
+--       return false
+--     end
+--     return true
+--   end,
+-- })

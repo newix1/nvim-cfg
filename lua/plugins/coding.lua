@@ -415,3 +415,59 @@ require("iswap").setup({})
 -- vim.keymap.set("n", "<Leader>z", function()
 --   require("zen-mode").toggle()
 -- end, { desc = "Toggle Zen mode" })
+
+---------------------------------------------------------------------
+--------------------------- Minuet AI --------------------------------
+---------------------------------------------------------------------
+
+vim.pack.add({
+  { src = "https://github.com/milanglacier/minuet-ai.nvim" },
+})
+
+require("minuet").setup({
+  -- Используем локальную модель через Ollama
+  provider = 'openai_fim_compatible',
+  request_timeout = 3,
+  throttle = 1000,
+  debounce = 400,
+  context_window = 8000,
+  n_completions = 2,
+
+  provider_options = {
+    openai_fim_compatible = {
+      api_key = 'TERM', -- заглушка
+      name = 'Ollama',
+      end_point = 'http://localhost:11434/v1/completions',
+      model = 'qwen2.5-coder:7b',
+      optional = {
+        max_tokens = 256,
+        top_p = 0.9,
+      },
+    },
+  },
+
+  -- Виртуальный текст (подсказки прямо в строке)
+  virtualtext = {
+    keymap = {
+      accept = '<A-A>',       -- принять всю подсказку
+      accept_line = '<A-a>',  -- принять одну строку
+      dismiss = '<A-e>',      -- закрыть подсказку
+      next = '<A-]>',         -- следующая подсказка
+      prev = '<A-[>',         -- предыдущая подсказка
+    },
+  },
+
+  -- Интеграция с blink.cmp (если хочешь подсказки в меню)
+  blink = {
+    enable_auto_complete = true,
+  },
+})
+
+-- Бинды для управления Minuet
+vim.keymap.set('i', '<A-y>', function()
+  require('minuet.virtualtext').action.next()
+end, { desc = 'Minuet next' })
+
+vim.keymap.set('i', '<A-u>', function()
+  require('minuet.virtualtext').action.prev()
+end, { desc = 'Minuet prev' })

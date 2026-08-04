@@ -33,6 +33,8 @@ map("n", "<Leader>cd", "<Cmd>cd %:p:h<CR>", { desc = "Change cwd to current file
 -- Отключаем q как запись макроса
 vim.keymap.set("n", "q", "<Nop>", { desc = "Disable q (macro recording)" })
 
+vim.keymap.set("n", "<leader>lx", vim.diagnostic.open_float, { desc = "Show diagnostics" })
+
 -- map("n", "<Leader>gg", function()
 --   local buf = vim.api.nvim_create_buf(false, true)
 --   local width = math.floor(vim.o.columns * 0.9)
