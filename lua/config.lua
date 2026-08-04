@@ -47,6 +47,7 @@ require('vim._core.ui2').enable({
   },
 })
 
+-- отключить отображение табов и других нев. символов для go
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "go",
   callback = function()
@@ -54,81 +55,81 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- winbar показывает текущую функцию/класс через LSP (асинхронно)
-vim.opt.winbar = "%{%v:lua.WinBar()%}"
-
--- Кеш для winbar
-local winbar_cache = {}
-
-function WinBar()
-  local bufnr = vim.api.nvim_get_current_buf()
-  local row = vim.api.nvim_win_get_cursor(0)[1] - 1
-
-  -- Проверяем кеш (если есть и совпадает строка)
-  if winbar_cache[bufnr] and winbar_cache[bufnr].row == row then
-    return winbar_cache[bufnr].text
-  end
-
-  -- Проверяем, есть ли LSP-клиент
-  local clients = vim.lsp.get_clients({ bufnr = bufnr })
-  if #clients == 0 then
-    winbar_cache[bufnr] = { row = row, text = "" }
-    return ""
-  end
-
-  -- Асинхронный запрос к LSP
-  local params = { textDocument = { uri = vim.uri_from_bufnr(bufnr) } }
-  vim.lsp.buf_request(bufnr, "textDocument/documentSymbol", params, function(err, result)
-    if err or not result then
-      winbar_cache[bufnr] = { row = row, text = "" }
-      vim.cmd("redrawstatus")
-      return
-    end
-
-    local symbols = result
-    if not symbols or #symbols == 0 then
-      winbar_cache[bufnr] = { row = row, text = "" }
-      vim.cmd("redrawstatus")
-      return
-    end
-
-    -- Рекурсивно собираем все символы
-    local function flatten_symbols(sym_list, acc)
-      acc = acc or {}
-      for _, sym in ipairs(sym_list) do
-        table.insert(acc, sym)
-        if sym.children then
-          flatten_symbols(sym.children, acc)
-        end
-      end
-      return acc
-    end
-
-    local flat_symbols = flatten_symbols(symbols)
-
-    -- Ищем символ, содержащий текущую строку
-    local current_symbol = nil
-    for _, sym in ipairs(flat_symbols) do
-      local range = sym.range or sym.selectionRange
-      if range and range.start.line <= row and range["end"].line >= row then
-        current_symbol = sym
-        break
-      end
-    end
-
-    if current_symbol then
-      winbar_cache[bufnr] = { row = row, text = "  " .. current_symbol.name }
-    else
-      winbar_cache[bufnr] = { row = row, text = "" }
-    end
-
-    -- Обновляем статусную строку, чтобы отобразить winbar
-    vim.cmd("redrawstatus")
-  end)
-
-  -- Пока LSP не ответил, показываем пустую строку
-  return ""
-end
+-- -- winbar показывает текущую функцию/класс через LSP (асинхронно)
+-- vim.opt.winbar = "%{%v:lua.WinBar()%}"
+--
+-- -- Кеш для winbar
+-- local winbar_cache = {}
+--
+-- function WinBar()
+--   local bufnr = vim.api.nvim_get_current_buf()
+--   local row = vim.api.nvim_win_get_cursor(0)[1] - 1
+--
+--   -- Проверяем кеш (если есть и совпадает строка)
+--   if winbar_cache[bufnr] and winbar_cache[bufnr].row == row then
+--     return winbar_cache[bufnr].text
+--   end
+--
+--   -- Проверяем, есть ли LSP-клиент
+--   local clients = vim.lsp.get_clients({ bufnr = bufnr })
+--   if #clients == 0 then
+--     winbar_cache[bufnr] = { row = row, text = "" }
+--     return ""
+--   end
+--
+--   -- Асинхронный запрос к LSP
+--   local params = { textDocument = { uri = vim.uri_from_bufnr(bufnr) } }
+--   vim.lsp.buf_request(bufnr, "textDocument/documentSymbol", params, function(err, result)
+--     if err or not result then
+--       winbar_cache[bufnr] = { row = row, text = "" }
+--       vim.cmd("redrawstatus")
+--       return
+--     end
+--
+--     local symbols = result
+--     if not symbols or #symbols == 0 then
+--       winbar_cache[bufnr] = { row = row, text = "" }
+--       vim.cmd("redrawstatus")
+--       return
+--     end
+--
+--     -- Рекурсивно собираем все символы
+--     local function flatten_symbols(sym_list, acc)
+--       acc = acc or {}
+--       for _, sym in ipairs(sym_list) do
+--         table.insert(acc, sym)
+--         if sym.children then
+--           flatten_symbols(sym.children, acc)
+--         end
+--       end
+--       return acc
+--     end
+--
+--     local flat_symbols = flatten_symbols(symbols)
+--
+--     -- Ищем символ, содержащий текущую строку
+--     local current_symbol = nil
+--     for _, sym in ipairs(flat_symbols) do
+--       local range = sym.range or sym.selectionRange
+--       if range and range.start.line <= row and range["end"].line >= row then
+--         current_symbol = sym
+--         break
+--       end
+--     end
+--
+--     if current_symbol then
+--       winbar_cache[bufnr] = { row = row, text = "  " .. current_symbol.name }
+--     else
+--       winbar_cache[bufnr] = { row = row, text = "" }
+--     end
+--
+--     -- Обновляем статусную строку, чтобы отобразить winbar
+--     vim.cmd("redrawstatus")
+--   end)
+--
+--   -- Пока LSP не ответил, показываем пустую строку
+--   return ""
+-- end
 
 vim.opt.completeopt:append("popup")
 local progress = vim.ui.progress_status()
@@ -340,3 +341,76 @@ opt.wrap = false -- Disable line wrap
 
 -- Fix markdown indentation settings
 vim.g.markdown_recommended_style = 0
+
+-- Пользовательская команда :Git
+vim.api.nvim_create_user_command("Git", function(opts)
+  local args = opts.args
+  if args == "" then
+    vim.notify("Usage: :Git <command>", vim.log.levels.INFO)
+    return
+  end
+
+  -- Выполняем git команду
+  local cmd = "git " .. args
+  local output = vim.fn.system(cmd)
+
+  if vim.v.shell_error ~= 0 then
+    vim.notify("Git error: " .. output, vim.log.levels.ERROR)
+    return
+  end
+
+  -- Если вывод пустой, просто уведомление
+  if output == "" then
+    vim.notify("Git command executed successfully", vim.log.levels.INFO)
+    return
+  end
+
+  -- Открываем вывод в новом буфере (без записи на диск)
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(output, "\n"))
+
+  -- Настройки окна
+  local opts_win = {
+    relative = "editor",
+    width = math.floor(vim.o.columns * 0.8),
+    height = math.floor(vim.o.lines * 0.6),
+    row = math.floor((vim.o.lines - math.floor(vim.o.lines * 0.6)) / 2),
+    col = math.floor((vim.o.columns - math.floor(vim.o.columns * 0.8)) / 2),
+    style = "minimal",
+    border = "rounded",
+  }
+
+  local win = vim.api.nvim_open_win(buf, true, opts_win)
+  vim.bo[buf].filetype = "git"
+  vim.bo[buf].buftype = "nofile"
+  vim.bo[buf].bufhidden = "wipe"
+
+  -- Бинд для закрытия окна (q)
+  vim.keymap.set("n", "q", function()
+    vim.api.nvim_win_close(win, true)
+  end, { buffer = buf, nowait = true })
+
+end, {
+  nargs = "+",
+  complete = function(arg_lead, cmd_line, cursor_pos)
+    local commands = {
+      "status", "log", "diff", "show", "cherry-pick", "rebase",
+      "branch", "checkout", "merge", "pull", "push", "stash",
+    }
+    return vim.tbl_filter(function(cmd)
+      return vim.startswith(cmd, arg_lead)
+    end, commands)
+  end,
+})
+
+vim.diagnostic.config{
+    signs = true,
+    signs = {
+        text = {
+            [vim.diagnostic.severity.ERROR] = "",
+            [vim.diagnostic.severity.WARN]  = "",
+            [vim.diagnostic.severity.INFO]  = "",
+            [vim.diagnostic.severity.HINT]  = "",
+        },
+    },
+}

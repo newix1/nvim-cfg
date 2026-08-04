@@ -8,13 +8,177 @@ end
 
 local map = vim.keymap.set
 
--- ---------------------------------------------------------------------
--- ----------------------------- Snacks --------------------------------
--- ---------------------------------------------------------------------
---
--- vim.pack.add({
--- 	{ src = gh("folke/snacks.nvim") },
--- })
+---------------------------------------------------------------------
+----------------------------- Snacks --------------------------------
+---------------------------------------------------------------------
+
+vim.pack.add({
+  { src = gh("folke/snacks.nvim") },
+})
+
+-- Включаем snacks только для lazygit
+require("snacks").setup({
+  lazygit = {
+    configure = true, -- Автоматически настраивает lazygit под Neovim
+    config = {
+      os = { editPreset = "nvim-remote" }, -- Редактирование в текущем Neovim
+    },
+    theme = {
+      -- Настройка цветов под твою тему (опционально)
+      selectedLineBgColor = { bg = "Visual" },
+      unstagedChangesColor = { fg = "DiagnosticError" },
+    },
+    win = {
+      style = "lazygit",
+    },
+  },
+  indent = {
+    -- Настройка линий отступов
+    indent = {
+      enabled = true,
+      char = "│",                -- символ вертикальной линии
+      only_current = false,      -- показывать во всех окнах
+      only_scope = false,        -- показывать линии только для текущей области (scope)
+      hl = "SnacksIndent",       -- цветовая группа (можно задать массив для "радужных" линий)
+    },
+
+    -- Настройка подсветки текущей области (scope)
+    scope = {
+      enabled = true,
+      char = "│",                -- символ для границ области
+      underline = false,         -- подчёркивать начало области
+      only_current = false,      -- показывать во всех окнах
+      hl = "SnacksIndentScope",  -- цветовая группа
+      priority = 200,
+    },
+
+    -- Анимация для появления области (работает в Neovim >= 0.10)
+    animate = {
+      enabled = true,
+      style = "out",             -- "out", "up", "down", "up_down"
+      easing = "linear",
+      duration = {
+        step = 20,               -- миллисекунд на шаг
+        total = 500,             -- максимальная длительность анимации
+      },
+    },
+
+    -- Фильтр для буферов (отключаем в терминалах и т.д.)
+    filter = function(buf, win)
+      return vim.g.snacks_indent ~= false
+        and vim.b[buf].snacks_indent ~= false
+        and vim.bo[buf].buftype == ""
+    end,
+  },
+  words = {
+    enabled = true,
+    debounce = 200,      -- задержка перед обновлением (мс)
+    notify_jump = false, -- не показывать уведомления при прыжке
+    notify_end = true,   -- показывать уведомление при достижении конца
+    foldopen = true,     -- раскрывать фолды при прыжке
+    jumplist = true,     -- сохранять позицию в jumplist
+    modes = { "n", "i", "c" }, -- режимы, в которых работает
+    filter = function(buf)
+      return vim.g.snacks_words ~= false and vim.b[buf].snacks_words ~= false
+    end,
+  },
+  scroll = {
+    enabled = true,
+    animate = {
+      duration = { step = 10, total = 200 }, -- шаг и общая длительность
+      easing = "linear",
+    },
+    -- ускоренная анимация при повторном скролле
+    animate_repeat = {
+      delay = 100,
+      duration = { step = 5, total = 50 },
+      easing = "linear",
+    },
+    filter = function(buf)
+      -- Отключаем для терминалов и буферов с buftype "nowrite"
+      if vim.bo[buf].buftype == "terminal" or vim.bo[buf].buftype == "nowrite" then
+        return false
+      end
+      return vim.g.snacks_scroll ~= false
+        and vim.b[buf].snacks_scroll ~= false
+    end,
+  },
+  zen = {
+    -- Отключаем затемнение (dim)
+    toggles = {
+      dim = false,   -- <-- выключаем затемнение кода
+      git_signs = false,
+      diagnostics = false,
+      inlay_hints = false,
+    },
+    center = true,   -- центрируем окно
+    show = {
+      statusline = false,
+      tabline = false,
+    },
+    win = {
+      style = "zen",
+      -- Настройки фона за окном
+      backdrop = {
+        transparent = false, -- делаем фон непрозрачным (чёрным)
+        blend = 0,           -- без смешивания
+      },
+    },
+  },
+  statuscolumn = {
+    enabled = true,
+    -- Компоненты слева (более высокий приоритет — ближе к тексту)
+    left = {
+      "mark",   -- Знаки (диагностика, например, E, W)
+      "sign",   -- Git-знаки (из gitsigns)
+    },
+    -- Компоненты справа (более высокий приоритет — ближе к тексту)
+    right = {
+      "fold",   -- Иконки фолдов
+      "git",    -- Git-знаки
+    },
+    -- Настройка фолдов
+    folds = {
+      open = false,     -- не показывать иконки открытых фолдов
+      git_hl = false,   -- не использовать цвета Git для фолдов
+    },
+    -- Паттерны для определения Git-знаков
+    git = {
+      patterns = { "GitSign", "MiniDiffSign" },
+    },
+    refresh = 50, -- обновление не чаще 50 мс
+  },
+})
+
+vim.api.nvim_create_autocmd("User", {
+  pattern = "CodeDiffOpen",
+  callback = function()
+    require("snacks").scroll.disable()
+  end,
+})
+
+-- Включаем snacks.scroll обратно при закрытии CodeDiff
+vim.api.nvim_create_autocmd("User", {
+  pattern = "CodeDiffClose",
+  callback = function()
+    require("snacks").scroll.enable()
+  end,
+})
+
+-- Бинд для открытия lazygit через snacks
+vim.keymap.set("n", "<Leader>gg", function()
+  require("snacks").lazygit.open()
+end, { desc = "Open lazygit" })
+
+-- Zen-режим
+map("n", "<leader>z", function()
+  Snacks.zen()
+end, { desc = "Toggle Zen Mode" })
+
+-- Zoom (увеличить текущее окно на весь экран)
+map("n", "<leader>Z", function()
+  Snacks.zen.zoom()
+end, { desc = "Toggle Zoom" })
 
 ---------------------------------------------------------------------
 --------------------------- blink.cmp -------------------------------
@@ -317,50 +481,50 @@ map("n", "<Leader>up", "<Cmd>IlluminatePause<CR>", { desc = "Pause illumination"
 map("n", "<Leader>ur", "<Cmd>IlluminateResume<CR>", { desc = "Resume illumination" })
 map("n", "<Leader>ut", "<Cmd>IlluminateToggle<CR>", { desc = "Toggle illumination" })
 
----------------------------------------------------------------------
------------------------ mini.indentscope ----------------------------
----------------------------------------------------------------------
-
--- 1. Добавляем плагин
-vim.pack.add({
-  { src = "https://github.com/nvim-mini/mini.indentscope" },
-})
-
--- 2. Настройка
-require("mini.indentscope").setup({
-  -- Настройка отрисовки
-  draw = {
-    -- Задержка перед отображением (в мс)
-    delay = 100,
-    -- Простая анимация без лишних эффектов
-    animation = require("mini.indentscope").gen_animation.none(),
-    -- Приоритет отображения (чтобы не перекрывалось другими элементами)
-    priority = 2,
-  },
-
-  -- Настройка внешнего вида
-  symbol = "│",  -- символ вертикальной линии
-
-  -- Опции вычисления области видимости
-  options = {
-    -- Тип границы: 'both' (сверху и снизу), 'top', 'bottom', 'none'
-    border = "both",
-    -- Учитывать столбец курсора для вычисления отступа
-    indent_at_cursor = true,
-    -- Максимальное число строк для поиска границ
-    n_lines = 10000,
-  },
-
-  -- Маппинги для работы с областью видимости
-  mappings = {
-    -- Текст-объекты (работают в визуальном режиме и с операторами)
-    object_scope = "ii",           -- внутренняя область
-    object_scope_with_border = "ai", -- область с границами
-    -- Перемещение к границам области
-    goto_top = "[i",   -- переход к верхней границе
-    goto_bottom = "]i", -- переход к нижней границе
-  },
-})
+-- ---------------------------------------------------------------------
+-- ----------------------- mini.indentscope ----------------------------
+-- ---------------------------------------------------------------------
+--
+-- -- 1. Добавляем плагин
+-- vim.pack.add({
+--   { src = "https://github.com/nvim-mini/mini.indentscope" },
+-- })
+--
+-- -- 2. Настройка
+-- require("mini.indentscope").setup({
+--   -- Настройка отрисовки
+--   draw = {
+--     -- Задержка перед отображением (в мс)
+--     delay = 100,
+--     -- Простая анимация без лишних эффектов
+--     animation = require("mini.indentscope").gen_animation.none(),
+--     -- Приоритет отображения (чтобы не перекрывалось другими элементами)
+--     priority = 2,
+--   },
+--
+--   -- Настройка внешнего вида
+--   symbol = "│",  -- символ вертикальной линии
+--
+--   -- Опции вычисления области видимости
+--   options = {
+--     -- Тип границы: 'both' (сверху и снизу), 'top', 'bottom', 'none'
+--     border = "both",
+--     -- Учитывать столбец курсора для вычисления отступа
+--     indent_at_cursor = true,
+--     -- Максимальное число строк для поиска границ
+--     n_lines = 10000,
+--   },
+--
+--   -- Маппинги для работы с областью видимости
+--   mappings = {
+--     -- Текст-объекты (работают в визуальном режиме и с операторами)
+--     object_scope = "ii",           -- внутренняя область
+--     object_scope_with_border = "ai", -- область с границами
+--     -- Перемещение к границам области
+--     goto_top = "[i",   -- переход к верхней границе
+--     goto_bottom = "]i", -- переход к нижней границе
+--   },
+-- })
 
 ---------------------------------------------------------------------
 ----------------------------- Arrow ---------------------------------
@@ -404,13 +568,286 @@ require("arrow").setup({
   },
 })
 
--- Бинды для быстрого переключения между закладками
+vim.cmd("packadd nvim.undotree")
+
+-- Команда уже есть, просто бинд для быстрого вызова
+vim.keymap.set("n", "<Leader>u", "<Cmd>Undotree<CR>", { desc = "Open undotree" })
+
+---------------------------------core------------------------------------
+-------------------------- multicursor.nvim --------------------------
+---------------------------------------------------------------------
+
+vim.pack.add({
+  { src = "https://github.com/jake-stewart/multicursor.nvim", branch = "1.0" },
+})
+
+local mc = require("multicursor-nvim")
+mc.setup()
+
 local map = vim.keymap.set
-local arrow = require("arrow")
 
--- Лидер-клавиша (по умолчанию ";") открывает меню
--- Это настраивается в `leader_key`, так что отдельно биндить не нужно
+-- === Добавление курсоров ===
 
--- Дополнительные бинды для переключения предыдущей/следующей закладки
-map("n", "H", function() arrow.persist.previous() end, { desc = "Arrow: previous file" })
-map("n", "L", function() arrow.persist.next() end, { desc = "Arrow: next file" })
+-- Добавить курсор выше/ниже
+map({"n", "x"}, "<C-Up>", function() mc.lineAddCursor(-1) end, { desc = "Add cursor above" })
+map({"n", "x"}, "<C-Down>", function() mc.lineAddCursor(1) end, { desc = "Add cursor below" })
+
+-- Добавить курсор на следующее/предыдущее совпадение слова/выделения
+map({"n", "x"}, "<C-n>", function() mc.matchAddCursor(1) end, { desc = "Add cursor next match" })
+map({"n", "x"}, "<C-p>", function() mc.matchAddCursor(-1) end, { desc = "Add cursor prev match" })
+
+-- === Управление курсорами ===
+
+-- Включить/выключить мультикурсоры
+map({"n", "x"}, "<C-q>", mc.toggleCursor, { desc = "Toggle multi-cursor" })
+
+-- Удалить текущий курсор (когда их несколько)
+mc.addKeymapLayer(function(layerSet)
+  layerSet({"n", "x"}, "<leader>cc", mc.deleteCursor, { desc = "Delete cursor" })
+end)
+
+-- Enable and clear cursors using escape.
+mc.addKeymapLayer(function(layerSet)
+layerSet("n", "<esc>", function()
+    if not mc.cursorsEnabled() then
+        mc.enableCursors()
+    else
+        mc.clearCursors()
+    end
+  end)
+end)
+
+-- === Навигация между курсорами ===
+
+mc.addKeymapLayer(function(layerSet)
+  layerSet({"n", "x"}, "<left>", mc.prevCursor, { desc = "Prev cursor" })
+  layerSet({"n", "x"}, "<right>", mc.nextCursor, { desc = "Next cursor" })
+end)
+
+-- === Визуальные настройки ===
+
+local hl = vim.api.nvim_set_hl
+hl(0, "MultiCursorCursor", { reverse = true })
+hl(0, "MultiCursorVisual", { link = "Visual" })
+hl(0, "MultiCursorSign", { link = "SignColumn" })
+hl(0, "MultiCursorMatchPreview", { link = "Search" })
+
+-- === Дополнительные полезные действия ===
+
+-- Добавить курсор на все совпадения в документе
+map({"n", "x"}, "<leader>A", mc.matchAllAddCursors, { desc = "Add cursors for all matches" })
+
+-- Восстановить последние курсоры (если случайно очистил)
+map("n", "<leader>gv", mc.restoreCursors, { desc = "Restore cursors" })
+
+-- ---------------------------------------------------------------------
+-- --------------------------- mini.map --------------------------------
+-- ---------------------------------------------------------------------
+--
+-- vim.pack.add({
+--   { src = "https://github.com/nvim-mini/mini.map" },
+-- })
+--
+-- require("mini.map").setup({
+--   integrations = {
+--     -- Подсветка диагностики (ошибки, предупреждения)
+--     require("mini.map").gen_integration.diagnostic({
+--       error = "DiagnosticFloatingError",
+--       warn = "DiagnosticFloatingWarn",
+--       info = "DiagnosticFloatingInfo",
+--       hint = "DiagnosticFloatingHint",
+--     }),
+--     -- Подсветка Git-изменений через gitsigns
+--     require("mini.map").gen_integration.gitsigns(),
+--   },
+--
+--   symbols = {
+--     -- Правильный вызов с разрешением 3x2 (стандартное)
+--     encode = require("mini.map").gen_encode_symbols.block("3x2"),
+--     scroll_line = "█",
+--     scroll_view = "┃",
+--   },
+--
+--   window = {
+--     side = "right",
+--     width = 10,
+--     winblend = 25,
+--     zindex = 10,
+--     focusable = false,
+--     show_integration_count = true,
+--   },
+-- })
+--
+-- -- Бинды
+-- local map = vim.keymap.set
+--
+-- map("n", "<Leader>m", function()
+--   require("mini.map").toggle()
+-- end, { desc = "Toggle mini.map" })
+--
+-- map("n", "<Leader>ms", function()
+--   require("mini.map").toggle_side()
+-- end, { desc = "Toggle mini.map side" })
+--
+-- map("n", "<Leader>mf", function()
+--   require("mini.map").toggle_focus()
+-- end, { desc = "Toggle mini.map focus" })
+
+-- ---------------------------------------------------------------------
+-- --------------------------- xmap.nvim -------------------------------
+-- ---------------------------------------------------------------------
+--
+-- vim.pack.add({
+--   { src = "https://github.com/ivantokar/xmap.nvim" },
+-- })
+--
+-- require("xmap").setup({
+--   -- Размер и положение
+--   width = 40,              -- Ширина окна
+--   side = "right",          -- Справа или слева
+--
+--   -- Автооткрытие для поддерживаемых типов файлов
+--   auto_open = false,       -- Не открывать автоматически, только по требованию
+--
+--   -- Поддерживаемые типы файлов
+--   filetypes = {
+--     "lua", "c", "cpp", "go", "rust", "python",
+--     "javascript", "typescript", "typescriptreact",
+--   },
+--
+--   -- Файлы, в которых не показывать
+--   exclude_filetypes = {
+--     "help", "terminal", "prompt", "qf",
+--     "neo-tree", "NvimTree", "lazy",
+--     "git", "oil",
+--   },
+--
+--   -- Бинды
+--   keymaps = {
+--     toggle = "<leader>mm",   -- Включить/выключить
+--     focus = "<leader>mf",    -- Сфокусироваться на мини-карте
+--     jump = "<CR>",           -- Перейти к строке
+--     close = "q",             -- Закрыть (внутри мини-карты)
+--   },
+--
+--   -- Настройка Treesitter
+--   treesitter = {
+--     enable = true,
+--     highlight_scopes = true,
+--     languages = {
+--       "lua", "c", "cpp", "go", "rust", "python",
+--       "javascript", "typescript", "typescriptreact",
+--     },
+--   },
+--
+--   -- Отображение
+--   render = {
+--     relative_prefix = {
+--       number_width = 4,
+--       number_separator = " ",
+--       separator = " ",
+--       direction = {
+--         up = "↑",
+--         down = "↓",
+--         current = "·",
+--       },
+--     },
+--     max_line_length = 40,
+--     throttle_ms = 100,
+--   },
+--
+--   -- Навигация
+--   navigation = {
+--     show_relative_line = true,  -- Показывать расстояние до прыжка
+--     auto_center = true,         -- Центрировать после прыжка
+--     follow_cursor = true,       -- Следовать за курсором
+--   },
+-- })
+--
+-- -- Дополнительные бинды, если хочешь открывать/закрывать по-другому
+-- local map = vim.keymap.set
+--
+-- map("n", "<leader>m", function()
+--   require("xmap").toggle()
+-- end, { desc = "Toggle minimap" })
+
+---------------------------------------------------------------------
+--------------------------- satellite.nvim --------------------------
+---------------------------------------------------------------------
+
+vim.pack.add({
+  { src = "https://github.com/lewis6991/satellite.nvim" },
+})
+
+---------------------------------------------------------------------
+---------------------------- nvim-navic -----------------------------
+---------------------------------------------------------------------
+
+vim.pack.add({
+  { src = "https://github.com/SmiteshP/nvim-navic" },
+})
+
+local navic = require("nvim-navic")
+
+navic.setup({
+  -- Иконки (можно взять свои или оставить стандартные)
+  icons = {
+    File          = "󰈙 ",
+    Module        = " ",
+    Namespace     = "󰌗 ",
+    Package       = " ",
+    Class         = "󰌗 ",
+    Method        = "󰆧 ",
+    Property      = " ",
+    Field         = " ",
+    Constructor   = " ",
+    Enum          = "󰕘",
+    Interface     = "󰕘",
+    Function      = "󰊕 ",
+    Variable      = "󰆧 ",
+    Constant      = "󰏿 ",
+    String        = "󰀬 ",
+    Number        = "󰎠 ",
+    Boolean       = "◩ ",
+    Array         = "󰅪 ",
+    Object        = "󰅩 ",
+    Key           = "󰌋 ",
+    Null          = "󰟢 ",
+    EnumMember    = " ",
+    Struct        = "󰌗 ",
+    Event         = " ",
+    Operator      = "󰆕 ",
+    TypeParameter = "󰊄 ",
+    enabled       = true,
+  },
+
+  -- Подсветка иконок и текста
+  highlight = true,
+
+  -- Разделитель между элементами
+  separator = "  ",
+
+  -- Глубина контекста (0 = без ограничений)
+  depth_limit = 0,
+
+  -- Индикатор обрезания
+  depth_limit_indicator = "..",
+
+  -- Безопасный вывод для statusline/winbar
+  safe_output = true,
+
+  -- Автоматическое обновление на CursorMoved (отключаем для производительности)
+  lazy_update_context = false,
+
+  -- Клик для перехода (можно включить, если хочешь)
+  click = false,
+
+  -- Настройки LSP
+  lsp = {
+    auto_attach = true, -- Автоматически подключаться к LSP
+    preference = nil,   -- Приоритет серверов (например, { "clangd", "pyright" })
+  },
+})
+
+-- Добавляем navic в winbar
+vim.opt.winbar = "%{%v:lua.require'nvim-navic'.get_location()%}"

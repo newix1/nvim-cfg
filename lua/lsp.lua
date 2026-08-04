@@ -7,5 +7,3 @@ vim.lsp.enable({
   "vtsls",
   "ocamllsp",
 })
-
-vim.diagnostic.config({ virtual_text = true })

@@ -107,139 +107,6 @@ require("lualine").setup({
 })
 
 -- ---------------------------------------------------------------------
--- ------------------------------ Snacks -------------------------------
--- ---------------------------------------------------------------------
---
--- vim.pack.add({
--- 	{ src = gh("folke/snacks.nvim") },
--- })
---
--- -- Функция-помощник для иконок (упрощённая)
--- local function get_icon(name, _, _)
--- 	local icons = {
--- 		FileNew = "",
--- 		Search = "",
--- 		DefaultFile = "",
--- 		WordFile = "",
--- 		Bookmarks = "",
--- 		Refresh = "",
--- 		DiagnosticError = "",
--- 		DiagnosticWarn = "",
--- 		DiagnosticInfo = "",
--- 		DiagnosticHint = "",
--- 		Debugger = "",
--- 	}
--- 	return icons[name] or ""
--- end
---
--- -- Настройка Snacks
--- require("snacks").setup({
--- 	-- Dashboard
--- 	dashboard = {
--- 		preset = {
--- 			keys = {
--- 			},
--- 			header = table.concat({
--- 				"  ███████╗███████╗██████╗  ██████╗ ██╗   ██╗██╗███╗   ███╗",
--- 				"  ╚══███╔╝██╔════╝██╔══██╗██╔═══██╗██║   ██║██║████╗ ████║",
--- 				"    ███╔╝ █████╗  ██████╔╝██║   ██║██║   ██║██║██╔████╔██║",
--- 				"   ███╔╝  ██╔══╝  ██╔══██╗██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║",
--- 				"  ███████╗███████╗██║  ██║╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║",
--- 				"  ╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝",
--- 				"",
--- 				"  ⚡ ZeroVim  |  vim.pack 0.12  |  @newix1  |  Own Your Editor",
--- 			}, "\n"),
--- 		},
--- 		sections = {
--- 			{ section = "header", padding = 5 },
--- 			{ section = "keys", gap = 1, padding = 3 },
--- 		},
--- 	},
---
--- 	-- Notifier
--- 	notifier = {
--- 		enabled = false,
--- 		timeout = 3000,
--- 		icons = {
--- 			debug = get_icon("Debugger"),
--- 			error = get_icon("DiagnosticError"),
--- 			info = get_icon("DiagnosticInfo"),
--- 			trace = get_icon("DiagnosticHint"),
--- 			warn = get_icon("DiagnosticWarn"),
--- 		},
--- 	},
---
--- 	-- Words (подсветка повторяющихся слов)
--- 	words = {
--- 		enabled = true,
--- 	},
---
--- 	-- Zen mode
--- 	zen = {
--- 		enabled = true,
--- 		toggles = { dim = false, diagnostics = false, inlay_hints = false },
--- 		win = {
--- 			width = function()
--- 				return math.min(120, math.floor(vim.o.columns * 0.75))
--- 			end,
--- 			height = 0.9,
--- 			backdrop = {
--- 				transparent = false,
--- 				win = { wo = { winhighlight = "Normal:Normal" } },
--- 			},
--- 			wo = {
--- 				number = false,
--- 				relativenumber = false,
--- 				signcolumn = "no",
--- 				foldcolumn = "0",
--- 				winbar = "",
--- 				list = false,
--- 				showbreak = "NONE",
--- 			},
--- 		},
--- 	},
---
--- 	-- Остальное отключаем (или оставляем по умолчанию)
--- 	picker = { enabled = false },
--- 	indent = { enabled = false },
--- 	scope = { enabled = false },
--- 	image = { doc = { enabled = false } },
--- })
---
--- -- Бинды для Snacks
--- local map = vim.keymap.set
---
--- -- Dashboard toggle
--- map("n", "<Leader>h", function()
--- 	if vim.bo.filetype == "snacks_dashboard" then
--- 		vim.cmd("q")
--- 	else
--- 		require("snacks").dashboard()
--- 	end
--- end, { desc = "Home Screen" })
---
--- -- Notifier
--- map("n", "<Leader>uD", function()
--- 	require("snacks.notifier").hide()
--- end, { desc = "Dismiss notifications" })
---
--- -- Zen mode
--- map("n", "<Leader>uZ", function()
--- 	require("snacks").toggle.zen():toggle()
--- end, { desc = "Toggle zen mode" })
---
--- -- Words (подсветка)
--- map("n", "<Leader>ur", function()
--- 	require("snacks").toggle.words():toggle()
--- end, { desc = "Toggle reference highlighting" })
--- map("n", "]r", function()
--- 	require("snacks").words.jump(vim.v.count1)
--- end, { desc = "Next reference" })
--- map("n", "[r", function()
--- 	require("snacks").words.jump(-vim.v.count1)
--- end, { desc = "Previous reference" })
-
--- ---------------------------------------------------------------------
 -- --------------------------- Neo-Tree --------------------------------
 -- ---------------------------------------------------------------------
 --
@@ -704,136 +571,218 @@ require("tiny-glimmer").setup({
 
 -- Опционально: бинды для управления анимациями (если понадобятся)
 local map = vim.keymap.set
-map("n", "<Leader>ge", "<Cmd>TinyGlimmer enable<CR>", { desc = "Enable animations" })
-map("n", "<Leader>gd", "<Cmd>TinyGlimmer disable<CR>", { desc = "Disable animations" })
+map("n", "<Leader>ue", "<Cmd>TinyGlimmer enable<CR>", { desc = "Enable animations" })
+map("n", "<Leader>ud", "<Cmd>TinyGlimmer disable<CR>", { desc = "Disable animations" })
 
----------------------------------------------------------------------
------------------------------ nvim-ufo ------------------------------
----------------------------------------------------------------------
+-- ---------------------------------------------------------------------
+-- ----------------------------- nvim-ufo ------------------------------
+-- ---------------------------------------------------------------------
+--
+-- vim.pack.add({
+--   { src = "https://github.com/kevinhwang91/nvim-ufo" },
+--   { src = "https://github.com/kevinhwang91/promise-async" },
+-- })
+--
+-- -- Базовые настройки фолдинга для Neovim
+-- vim.o.fillchars = 'eob: ,fold: ,foldopen:,foldsep: ,foldinner: ,foldclose:'
+-- vim.opt.foldcolumn = "1"     -- показывать столбец для фолдов
+-- vim.opt.foldlevel = 99       -- все блоки развёрнуты по умолчанию
+-- vim.opt.foldlevelstart = 99  -- при открытии файла все развёрнуто
+-- vim.opt.foldenable = true    -- фолдинг включён
+--
+-- -- Настройка ufo
+-- require("ufo").setup({
+--   -- Провайдеры: сначала LSP (самый точный), потом Treesitter, потом indent
+--   provider_selector = function(bufnr, filetype, buftype)
+--     return { "treesitter", "indent" }
+--   end,
+-- })
+--
+-- -- === Бинды для управления фолдами ===
+--
+-- local map = vim.keymap.set
+--
+-- -- Развернуть/свернуть всё
+-- map("n", "zR", require("ufo").openAllFolds, { desc = "Open all folds" })
+-- map("n", "zM", require("ufo").closeAllFolds, { desc = "Close all folds" })
+-- map("n", "zr", require("ufo").openFoldsExceptKinds, { desc = "Open folds except kinds" })
+-- map("n", "zm", require("ufo").closeFoldsWith, { desc = "Close folds" })
+--
+-- -- Предпросмотр свёрнутого блока (K по умолчанию, но у тебя K занят под LSP hover)
+-- -- Можно переназначить на другую клавишу или оставить как есть
+-- map("n", "<Leader>fp", function()
+--   local winid = require("ufo").peekFoldedLinesUnderCursor()
+--   if not winid then
+--     -- fallback на стандартный LSP hover (если надо)
+--     vim.lsp.buf.hover()
+--   end
+-- end, { desc = "Peek folded lines" })
 
-vim.pack.add({
-  { src = "https://github.com/kevinhwang91/nvim-ufo" },
-  { src = "https://github.com/kevinhwang91/promise-async" },
-})
 
--- Базовые настройки фолдинга для Neovim
-vim.o.fillchars = 'eob: ,fold: ,foldopen:,foldsep: ,foldinner: ,foldclose:'
-vim.opt.foldcolumn = "1"     -- показывать столбец для фолдов
-vim.opt.foldlevel = 99       -- все блоки развёрнуты по умолчанию
-vim.opt.foldlevelstart = 99  -- при открытии файла все развёрнуто
-vim.opt.foldenable = true    -- фолдинг включён
+-- ---------------------------------------------------------------------
+-- --------------------------- neoscroll -------------------------------
+-- ---------------------------------------------------------------------
+--
+-- vim.pack.add({
+--   { src = "https://github.com/karb94/neoscroll.nvim" },
+-- })
+--
+-- require("neoscroll").setup({
+--   -- Останавливаться в конце файла
+--   stop_eof = true,
+--
+--   -- Уважать `scrolloff` (чтобы не упираться в край)
+--   respect_scrolloff = false,
+--
+--   -- Прокручивать курсор, даже если окно не может прокрутиться дальше
+--   cursor_scrolls_alone = true,
+--
+--   -- Глобальный множитель длительности анимации
+--   duration_multiplier = 1.0,
+--
+--   -- Тип анимации по умолчанию
+--   easing = "sine",
+--
+--   -- Маппинги, которые будут переопределены
+--   mappings = {
+--     "<C-u>",
+--     "<C-d>",
+--     "<C-b>",
+--     "<C-f>",
+--     "<C-y>",
+--     "<C-e>",
+--     "zt",
+--     "zz",
+--     "zb",
+--   },
+--
+--   -- Отключаем производительность (она не нужна на современных машинах)
+--   performance_mode = false,
+-- })
+--
+-- -- Кастомные маппинги с разной длительностью для разных действий
+-- local neoscroll = require("neoscroll")
+-- local map = vim.keymap.set
+-- local modes = { "n", "v", "x" }
+--
+-- -- Настройка плавности для каждой команды
+-- map(modes, "<C-u>", function()
+--   neoscroll.ctrl_u({ duration = 250, easing = "sine" })
+-- end, { desc = "Smooth scroll up" })
+--
+-- map(modes, "<C-d>", function()
+--   neoscroll.ctrl_d({ duration = 250, easing = "sine" })
+-- end, { desc = "Smooth scroll down" })
+--
+-- map(modes, "<C-b>", function()
+--   neoscroll.ctrl_b({ duration = 450, easing = "circular" })
+-- end, { desc = "Smooth page up" })
+--
+-- map(modes, "<C-f>", function()
+--   neoscroll.ctrl_f({ duration = 450, easing = "circular" })
+-- end, { desc = "Smooth page down" })
+--
+-- map(modes, "<C-y>", function()
+--   neoscroll.scroll(-0.1, { move_cursor = false, duration = 100 })
+-- end, { desc = "Smooth scroll line up" })
+--
+-- map(modes, "<C-e>", function()
+--   neoscroll.scroll(0.1, { move_cursor = false, duration = 100 })
+-- end, { desc = "Smooth scroll line down" })
+--
+-- map("n", "zt", function()
+--   neoscroll.zt({ half_win_duration = 250 })
+-- end, { desc = "Smooth zt" })
+--
+-- map("n", "zz", function()
+--   neoscroll.zz({ half_win_duration = 250 })
+-- end, { desc = "Smooth zz" })
+--
+-- map("n", "zb", function()
+--   neoscroll.zb({ half_win_duration = 250 })
+-- end, { desc = "Smooth zb" })
 
--- Настройка ufo
-require("ufo").setup({
-  -- Провайдеры: сначала LSP (самый точный), потом Treesitter, потом indent
-  provider_selector = function(bufnr, filetype, buftype)
-    return { "treesitter", "indent" }
-  end,
-})
-
--- === Бинды для управления фолдами ===
-
-local map = vim.keymap.set
-
--- Развернуть/свернуть всё
-map("n", "zR", require("ufo").openAllFolds, { desc = "Open all folds" })
-map("n", "zM", require("ufo").closeAllFolds, { desc = "Close all folds" })
-map("n", "zr", require("ufo").openFoldsExceptKinds, { desc = "Open folds except kinds" })
-map("n", "zm", require("ufo").closeFoldsWith, { desc = "Close folds" })
-
--- Предпросмотр свёрнутого блока (K по умолчанию, но у тебя K занят под LSP hover)
--- Можно переназначить на другую клавишу или оставить как есть
-map("n", "<Leader>fp", function()
-  local winid = require("ufo").peekFoldedLinesUnderCursor()
-  if not winid then
-    -- fallback на стандартный LSP hover (если надо)
-    vim.lsp.buf.hover()
-  end
-end, { desc = "Peek folded lines" })
-
-
----------------------------------------------------------------------
---------------------------- neoscroll -------------------------------
----------------------------------------------------------------------
-
-vim.pack.add({
-  { src = "https://github.com/karb94/neoscroll.nvim" },
-})
-
-require("neoscroll").setup({
-  -- Скрывать курсор во время скролла (приятный эффект)
-  hide_cursor = true,
-
-  -- Останавливаться в конце файла
-  stop_eof = true,
-
-  -- Уважать `scrolloff` (чтобы не упираться в край)
-  respect_scrolloff = false,
-
-  -- Прокручивать курсор, даже если окно не может прокрутиться дальше
-  cursor_scrolls_alone = true,
-
-  -- Глобальный множитель длительности анимации
-  duration_multiplier = 1.0,
-
-  -- Тип анимации по умолчанию
-  easing = "sine",
-
-  -- Маппинги, которые будут переопределены
-  mappings = {
-    "<C-u>",
-    "<C-d>",
-    "<C-b>",
-    "<C-f>",
-    "<C-y>",
-    "<C-e>",
-    "zt",
-    "zz",
-    "zb",
-  },
-
-  -- Отключаем производительность (она не нужна на современных машинах)
-  performance_mode = false,
-})
-
--- Кастомные маппинги с разной длительностью для разных действий
-local neoscroll = require("neoscroll")
-local map = vim.keymap.set
-local modes = { "n", "v", "x" }
-
--- Настройка плавности для каждой команды
-map(modes, "<C-u>", function()
-  neoscroll.ctrl_u({ duration = 250, easing = "sine" })
-end, { desc = "Smooth scroll up" })
-
-map(modes, "<C-d>", function()
-  neoscroll.ctrl_d({ duration = 250, easing = "sine" })
-end, { desc = "Smooth scroll down" })
-
-map(modes, "<C-b>", function()
-  neoscroll.ctrl_b({ duration = 450, easing = "circular" })
-end, { desc = "Smooth page up" })
-
-map(modes, "<C-f>", function()
-  neoscroll.ctrl_f({ duration = 450, easing = "circular" })
-end, { desc = "Smooth page down" })
-
-map(modes, "<C-y>", function()
-  neoscroll.scroll(-0.1, { move_cursor = false, duration = 100 })
-end, { desc = "Smooth scroll line up" })
-
-map(modes, "<C-e>", function()
-  neoscroll.scroll(0.1, { move_cursor = false, duration = 100 })
-end, { desc = "Smooth scroll line down" })
-
-map("n", "zt", function()
-  neoscroll.zt({ half_win_duration = 250 })
-end, { desc = "Smooth zt" })
-
-map("n", "zz", function()
-  neoscroll.zz({ half_win_duration = 250 })
-end, { desc = "Smooth zz" })
-
-map("n", "zb", function()
-  neoscroll.zb({ half_win_duration = 250 })
-end, { desc = "Smooth zb" })
+-- ---------------------------------------------------------------------
+-- --------------------------- mini.animate ----------------------------
+-- ---------------------------------------------------------------------
+--
+-- vim.pack.add({
+--   { src = "https://github.com/nvim-mini/mini.animate" },
+-- })
+--
+-- require("mini.animate").setup({
+--   resize = {
+--     enable = true,
+--     timing = function(_, _) return 15 end,
+--     subresize = function(sizes_from, sizes_to)
+--       -- sizes_from и sizes_to - таблицы с размерами окон
+--       -- Возвращаем массив промежуточных состояний
+--       local steps = {}
+--       local n_steps = 20
+--
+--       for i = 1, n_steps do
+--         local step_state = {}
+--         for win_id, size_to in pairs(sizes_to) do
+--           local size_from = sizes_from[win_id]
+--           if size_from then
+--             -- Интерполируем размеры
+--             local progress = i / n_steps
+--             step_state[win_id] = {
+--               width = math.floor(size_from.width + (size_to.width - size_from.width) * progress),
+--               height = math.floor(size_from.height + (size_to.height - size_from.height) * progress),
+--             }
+--           end
+--         end
+--         steps[i] = step_state
+--       end
+--
+--       return steps
+--     end,
+--   },
+--
+--   open = {
+--     enable = true,
+--     timing = function(_, _)
+--       return 15
+--     end,
+--     winblend = function(step, total_steps)
+--       local progress = step / total_steps
+--       return math.floor(80 + 20 * progress)
+--     end,
+--   },
+--
+--   close = {
+--     enable = true,
+--     timing = function(_, _)
+--       return 15
+--     end,
+--     winblend = function(step, total_steps)
+--       local progress = step / total_steps
+--       return math.floor(100 - 20 * progress)
+--     end,
+--   },
+--
+--   cursor = {
+--     enable = false,
+--     timing = function(_, _)
+--       return 15
+--     end,
+--     path = function(_, _)
+--       return 30
+--     end,
+--   },
+--
+--   scroll = {
+--     enable = false,
+--     timing = function(_, _)
+--       return 15
+--     end,
+--     subscroll = function(total_steps)
+--       local steps = {}
+--       for i = 1, 20 do
+--         steps[i] = 1
+--       end
+--       return steps
+--     end,
+--   },
+-- })

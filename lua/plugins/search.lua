@@ -8,38 +8,59 @@ end
 
 local map = vim.keymap.set
 
--- vim.pack.add({
--- 	{ src = gh("ibhagwan/fzf-lua") },
--- })
---
--- require("fzf-lua").setup({})
---
--- local fzf = require("fzf-lua")
---
--- -- map("n", "<leader><leader>", fzf.files)
--- map("n", "<leader>/", fzf.live_grep, { desc = "Grep" })
--- map("n", "<Leader>f<CR>", fzf.resume, { desc = "Resume previous search" })
--- map("n", "<Leader>f'", fzf.marks, { desc = "Find marks" })
--- map("n", "<Leader>f/", fzf.lgrep_curbuf, { desc = "Find in current buffer" })
---
--- map("n", "<Leader>fb", fzf.buffers, { desc = "Find buffers" })
--- map("n", "<Leader>fc", fzf.grep_cword, { desc = "Find word under cursor" })
--- map("n", "<Leader>fC", fzf.commands, { desc = "Find commands" })
--- -- map("n", "<Leader>ff", fzf.files, { desc = "Find files" })
--- map("n", "<Leader>fh", fzf.helptags, { desc = "Find help" })
--- map("n", "<Leader>fk", fzf.keymaps, { desc = "Find keymaps" })
--- map("n", "<Leader>fm", fzf.manpages, { desc = "Find man" })
--- map("n", "<Leader>fo", fzf.oldfiles, { desc = "Find history" })
--- map("n", "<Leader>fr", fzf.registers, { desc = "Find registers" })
---
--- map("n", "<Leader>cf",
---   function()
---     require("fzf-lua").files({
---       prompt = "Config> ",
---       cwd = vim.fn.stdpath "config",
---     })
---   end,
---   { desc = "Find in config" })
+vim.pack.add({
+	{ src = gh("ibhagwan/fzf-lua") },
+})
+
+require("fzf-lua").setup({
+  winopts = {
+    -- split = "belowright new",-- open in a split instead?
+            -- "belowright new"  : split below
+            -- "aboveleft new"   : split above
+            -- "belowright vnew" : split right
+            -- "aboveleft vnew   : split left
+    -- Only valid when using a float window
+    -- (i.e. when 'split' is not defined, default)
+    height           = 0.60,            -- window height
+    width            = 0.60,            -- window width
+  }
+})
+
+local fzf = require("fzf-lua")
+
+map("n", "<Leader><Leader>", fzf.files, { desc = "Find files" })
+map("n", "<leader>/", fzf.live_grep, { desc = "Grep" })
+map("n", "<Leader>f<CR>", fzf.resume, { desc = "Resume previous search" })
+map("n", "<Leader>f'", fzf.marks, { desc = "Find marks" })
+map("n", "<Leader>f/", fzf.lgrep_curbuf, { desc = "Find in current buffer" })
+
+map("n", "<Leader>fb", fzf.buffers, { desc = "Find buffers" })
+map("n", "<Leader>fc", fzf.grep_cword, { desc = "Find word under cursor" })
+map("n", "<Leader>fC", fzf.commands, { desc = "Find commands" })
+map("n", "<Leader>ff", fzf.files, { desc = "Find files" })
+map("n", "<Leader>fh", fzf.helptags, { desc = "Find help" })
+map("n", "<Leader>fk", fzf.keymaps, { desc = "Find keymaps" })
+map("n", "<Leader>fm", fzf.manpages, { desc = "Find man" })
+map("n", "<Leader>fo", fzf.oldfiles, { desc = "Find history" })
+map("n", "<Leader>fr", fzf.registers, { desc = "Find registers" })
+
+map("n", "<Leader>cf",
+  function()
+    require("fzf-lua").files({
+      prompt = "Config> ",
+      cwd = vim.fn.stdpath "config",
+    })
+  end,
+  { desc = "Find in config" })
+
+map("n", "<Leader>fa",
+  function()
+    require("fzf-lua").files({
+      prompt = "Config> ",
+      cwd = vim.fn.stdpath "config",
+    })
+  end,
+  { desc = "Find in config" })
 
 vim.pack.add({ 'https://github.com/dmtrKovalenko/fff.nvim' })
 
@@ -64,70 +85,70 @@ fff.setup ({
   }
 })
 
--- Поиск файлов
-map("n", "<Leader><Leader>", function()
-  fff.find_files()
-end, { desc = "Find files" })
-
-map("n", "<Leader>ff", function()
-  fff.find_files()
-end, { desc = "Find files" })
-
-map("n", "<Leader>fF", function()
-  fff.find_files({ cwd = vim.fn.expand("%:p:h") })
-end, { desc = "Find files (current dir)" })
-
--- Поиск по содержимому (grep)
-map("n", "<Leader>fg", function()
-  fff.live_grep()
-end, { desc = "Find with grep" })
-
-map("n", "<Leader>/", function()
-  fff.live_grep()
-end, { desc = "Find with grep" })
-
-map("n", "<Leader>fG", function()
-  fff.live_grep({ cwd = vim.fn.expand("%:p:h") })
-end, { desc = "Find with grep (cwd)"})
-
--- Поиск слова под курсором (Normal mode)
-map("n", "<Leader>fw", function()
-  fff.live_grep_under_cursor()
-end, { desc = "Find word under cursor" })
-
--- Поиск выделенного текста (Visual mode)
-map("x", "<Leader>fw", function()
-  fff.live_grep_under_cursor()
-end, { desc = "Find selected text" })
-
--- Поиск в конкретной папке (конфиг)
-map("n", "<Leader>cf", function()
-  fff.find_files({
-    cwd = vim.fn.stdpath("config"),
-    prompt = "Config> ",
-  })
-end, { desc = "Find in config" })
-
--- Grep по конфигу
-map("n", "<Leader>cg", function()
-  fff.live_grep({
-    cwd = vim.fn.stdpath("config"),
-    prompt = "Config grep> ",
-  })
-end, { desc = "Grep in config" })
-
--- Поиск в конкретной папке (конфиг)
-map("n", "<Leader>fa", function()
-  fff.find_files({
-    cwd = vim.fn.stdpath("config"),
-    prompt = "Config> ",
-  })
-end, { desc = "Find in config" })
-
--- Принудительный рескан (если индекс устарел)
-map("n", "<Leader>fr", function()
-  fff.scan_files()
-end, { desc = "Rescan files" })
+-- -- Поиск файлов
+-- map("n", "<Leader><Leader>", function()
+--   fff.find_files()
+-- end, { desc = "Find files" })
+--
+-- map("n", "<Leader>ff", function()
+--   fff.find_files()
+-- end, { desc = "Find files" })
+--
+-- map("n", "<Leader>fF", function()
+--   fff.find_files({ cwd = vim.fn.expand("%:p:h") })
+-- end, { desc = "Find files (current dir)" })
+--
+-- -- Поиск по содержимому (grep)
+-- map("n", "<Leader>fg", function()
+--   fff.live_grep()
+-- end, { desc = "Find with grep" })
+--
+-- map("n", "<Leader>/", function()
+--   fff.live_grep()
+-- end, { desc = "Find with grep" })
+--
+-- map("n", "<Leader>fG", function()
+--   fff.live_grep({ cwd = vim.fn.expand("%:p:h") })
+-- end, { desc = "Find with grep (cwd)"})
+--
+-- -- Поиск слова под курсором (Normal mode)
+-- map("n", "<Leader>fw", function()
+--   fff.live_grep_under_cursor()
+-- end, { desc = "Find word under cursor" })
+--
+-- -- Поиск выделенного текста (Visual mode)
+-- map("x", "<Leader>fw", function()
+--   fff.live_grep_under_cursor()
+-- end, { desc = "Find selected text" })
+--
+-- -- Поиск в конкретной папке (конфиг)
+-- map("n", "<Leader>cf", function()
+--   fff.find_files({
+--     cwd = vim.fn.stdpath("config"),
+--     prompt = "Config> ",
+--   })
+-- end, { desc = "Find in config" })
+--
+-- -- Grep по конфигу
+-- map("n", "<Leader>cg", function()
+--   fff.live_grep({
+--     cwd = vim.fn.stdpath("config"),
+--     prompt = "Config grep> ",
+--   })
+-- end, { desc = "Grep in config" })
+--
+-- -- Поиск в конкретной папке (конфиг)
+-- map("n", "<Leader>fa", function()
+--   fff.find_files({
+--     cwd = vim.fn.stdpath("config"),
+--     prompt = "Config> ",
+--   })
+-- end, { desc = "Find in config" })
+--
+-- -- Принудительный рескан (если индекс устарел)
+-- map("n", "<Leader>fr", function()
+--   fff.scan_files()
+-- end, { desc = "Rescan files" })
 
 ---------------------------------------------------------------------
 ------------------------------ Oil ----------------------------------

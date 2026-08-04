@@ -33,30 +33,30 @@ map("n", "<Leader>cd", "<Cmd>cd %:p:h<CR>", { desc = "Change cwd to current file
 -- Отключаем q как запись макроса
 vim.keymap.set("n", "q", "<Nop>", { desc = "Disable q (macro recording)" })
 
-map("n", "<Leader>gg", function()
-  local buf = vim.api.nvim_create_buf(false, true)
-  local width = math.floor(vim.o.columns * 0.9)
-  local height = math.floor(vim.o.lines * 0.9)
-  local row = math.floor((vim.o.lines - height) / 2)
-  local col = math.floor((vim.o.columns - width) / 2)
-
-  local win = vim.api.nvim_open_win(buf, true, {
-    relative = "editor",
-    width = width,
-    height = height,
-    row = row,
-    col = col,
-    style = "minimal",
-    border = "rounded",
-  })
-
-  vim.fn.termopen("lazygit", {
-    on_exit = function()
-      vim.api.nvim_win_close(win, true)
-    end,
-  })
-  vim.cmd("startinsert")
-end, { desc = "Open lazygit" })
+-- map("n", "<Leader>gg", function()
+--   local buf = vim.api.nvim_create_buf(false, true)
+--   local width = math.floor(vim.o.columns * 0.9)
+--   local height = math.floor(vim.o.lines * 0.9)
+--   local row = math.floor((vim.o.lines - height) / 2)
+--   local col = math.floor((vim.o.columns - width) / 2)
+--
+--   local win = vim.api.nvim_open_win(buf, true, {
+--     relative = "editor",
+--     width = width,
+--     height = height,
+--     row = row,
+--     col = col,
+--     style = "minimal",
+--     border = "rounded",
+--   })
+--
+--   vim.fn.termopen("lazygit", {
+--     on_exit = function()
+--       vim.api.nvim_win_close(win, true)
+--     end,
+--   })
+--   vim.cmd("startinsert")
+-- end, { desc = "Open lazygit" })
 
 -- buffers
 map("n", "<S-tab>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
