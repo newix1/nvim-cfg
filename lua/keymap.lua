@@ -96,3 +96,11 @@ map("n", "<leader><tab><tab>", "<cmd>tabnew<cr>", { desc = "New Tab" })
 map("n", "<leader><tab>]", "<cmd>tabnext<cr>", { desc = "Next Tab" })
 map("n", "<leader><tab>d", "<cmd>tabclose<cr>", { desc = "Close Tab" })
 map("n", "<leader><tab>[", "<cmd>tabprevious<cr>", { desc = "Previous Tab" })
+
+-- Копировать в системный буфер через пробел + y
+map("n", "<Space>y", '"+y', { desc = "Copy to system clipboard" })
+map("v", "<Space>y", '"+y', { desc = "Copy selection to system clipboard" })
+
+-- Вставить из системного буфера
+map("n", "<Space>p", '"+p', { desc = "Paste from system clipboard" })
+map("v", "<Space>p", '"+p', { desc = "Paste from system clipboard" })
