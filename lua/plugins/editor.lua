@@ -71,7 +71,7 @@ require("snacks").setup({
     end,
   },
   words = {
-    enabled = true,
+    enabled = false,
     debounce = 200,      -- задержка перед обновлением (мс)
     notify_jump = false, -- не показывать уведомления при прыжке
     notify_end = true,   -- показывать уведомление при достижении конца
@@ -398,7 +398,7 @@ map("n", "<Leader>xi", "<Cmd>Trouble lsp_implementations toggle<CR>",
   { desc = "LSP Implementations (Trouble)" })
 
 -- Закрыть
-map("n", "<Leader>x", "<Cmd>Trouble close<CR>",
+map("n", "<Leader>xd", "<Cmd>Trouble close<CR>",
   { desc = "Close Trouble" })
 
 ---------------------------------------------------------------------
@@ -564,52 +564,52 @@ map("n", "<Leader>ut", "<Cmd>IlluminateToggle<CR>", { desc = "Toggle illuminatio
 --   },
 -- })
 
----------------------------------------------------------------------
------------------------------ Arrow ---------------------------------
----------------------------------------------------------------------
-
-vim.pack.add({
-  { src = "https://github.com/otavioschwanck/arrow.nvim" },
-})
-
--- Базовая настройка
-require("arrow").setup({
-  -- Показывать иконки для файлов
-  show_icons = true,
-
-  -- Главная клавиша для вызова меню (одна клавиша!)
-  leader_key = "m", -- Рекомендуется одна клавиша, например, ";"
-
-  -- Разделять закладки по веткам Git (удобно, если переключаешься между задачами)
-  separate_by_branch = true,
-
-  -- Показывать полный путь только если есть одинаковые имена файлов
-  always_show_path = false,
-
-  -- Внешний вид окна
-  window = {
-    border = "rounded",
-    width = "auto",
-    height = "auto",
-  },
-
-  -- Клавиши для управления в меню
-  mappings = {
-    edit = "e",          -- редактировать файл
-    delete_mode = "d",   -- режим удаления
-    toggle = "s",        -- сохранить/убрать закладку
-    open_vertical = "v", -- открыть вертикально
-    open_horizontal = "-", -- открыть горизонтально
-    quit = "q",          -- закрыть меню
-    next_item = "]",
-    prev_item = "[",
-  },
-})
+-- ---------------------------------------------------------------------
+-- ----------------------------- Arrow ---------------------------------
+-- ---------------------------------------------------------------------
+--
+-- vim.pack.add({
+--   { src = "https://github.com/otavioschwanck/arrow.nvim" },
+-- })
+--
+-- -- Базовая настройка
+-- require("arrow").setup({
+--   -- Показывать иконки для файлов
+--   show_icons = true,
+--
+--   -- Главная клавиша для вызова меню (одна клавиша!)
+--   leader_key = ";", -- Рекомендуется одна клавиша, например, ";"
+--
+--   -- Разделять закладки по веткам Git (удобно, если переключаешься между задачами)
+--   separate_by_branch = true,
+--
+--   -- Показывать полный путь только если есть одинаковые имена файлов
+--   always_show_path = false,
+--
+--   -- Внешний вид окна
+--   window = {
+--     border = "rounded",
+--     width = "auto",
+--     height = "auto",
+--   },
+--
+--   -- Клавиши для управления в меню
+--   mappings = {
+--     edit = "e",          -- редактировать файл
+--     delete_mode = "d",   -- режим удаления
+--     toggle = "s",        -- сохранить/убрать закладку
+--     open_vertical = "v", -- открыть вертикально
+--     open_horizontal = "-", -- открыть горизонтально
+--     quit = "q",          -- закрыть меню
+--     next_item = "]",
+--     prev_item = "[",
+--   },
+-- })
 
 vim.cmd("packadd nvim.undotree")
 
 -- Команда уже есть, просто бинд для быстрого вызова
-vim.keymap.set("n", "<Leader>u", "<Cmd>Undotree<CR>", { desc = "Open undotree" })
+vim.keymap.set("n", "<Leader>ut", "<Cmd>Undotree<CR>", { desc = "Open undotree" })
 
 ---------------------------------core------------------------------------
 -------------------------- multicursor.nvim --------------------------
@@ -860,7 +860,7 @@ navic.setup({
   },
 
   -- Подсветка иконок и текста
-  highlight = true,
+  highlight = false,
 
   -- Разделитель между элементами
   separator = "  ",
@@ -883,7 +883,7 @@ navic.setup({
   -- Настройки LSP
   lsp = {
     auto_attach = true, -- Автоматически подключаться к LSP
-    preference = nil,   -- Приоритет серверов (например, { "clangd", "pyright" })
+    preference = { "vue_ls", "vtsls" },   -- Приоритет серверов (например, { "clangd", "pyright" })
   },
 })
 

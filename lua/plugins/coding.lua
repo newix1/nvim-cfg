@@ -124,7 +124,7 @@ local function plugins_cheatsheet()
   vim.cmd("resize 25")
 end
 
-vim.keymap.set("n", "<Leader>p?", plugins_cheatsheet, { desc = "Плагины ZeroVim: шпаргалка" })
+vim.keymap.set("n", "<Leader>u?", plugins_cheatsheet, { desc = "Плагины ZeroVim: шпаргалка" })
 
 -- vim.pack.add({ 'https://github.com/nvim-mini/mini.ai' })
 --
@@ -158,16 +158,16 @@ require("render-markdown").setup({})
 
 ----------------------------------------------------------------------------------------
 
-vim.pack.add({ 'https://github.com/DrKJeff16/project.nvim' })
-
-require("project").setup({
-    fzf_lua = {
-    -- Enables fzf-lua picker integration
-    enabled = true,
-  }
-})
-
-vim.keymap.set("n", "<leader>pp", "<Cmd>Project fzf-lua<CR>", { desc = "Open project" })
+-- vim.pack.add({ 'https://github.com/DrKJeff16/project.nvim' })
+--
+-- require("project").setup({
+--     fzf_lua = {
+--     -- Enables fzf-lua picker integration
+--     enabled = true,
+--   }
+-- })
+--
+-- vim.keymap.set("n", "<leader>pp", "<Cmd>Project fzf-lua<CR>", { desc = "Open project" })
 
 ---------------------------------------------------------------------
 ---------------- nvim-treesitter-textobjects ------------------------
@@ -386,19 +386,9 @@ require("treesj").setup({
 local map = vim.keymap.set
 
 -- Toggle: если блок однострочный — развернуть, если многострочный — свернуть
-map("n", "<leader>j", function()
+map("n", "gs", function()
   require("treesj").toggle()
 end, { desc = "Toggle split/join" })
-
--- Принудительно развернуть блок
-map("n", "<leader>J", function()
-  require("treesj").split()
-end, { desc = "Split block" })
-
--- Принудительно свернуть блок
-map("n", "<leader>s", function()
-  require("treesj").join()
-end, { desc = "Join block" })
 
 ----------------------------------------------------------------------------------------
 

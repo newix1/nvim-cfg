@@ -10,7 +10,7 @@ vim.pack.add({
 	gh("nvim-tree/nvim-web-devicons"),
 	gh("nvim-lualine/lualine.nvim"),
 	gh("nvim-treesitter/nvim-treesitter"),
-  gh("goolord/alpha-nvim"),
+  -- gh("goolord/alpha-nvim"),
 })
 
 -- local startify = require("alpha.themes.startify")

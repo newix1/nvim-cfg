@@ -6,7 +6,7 @@ local function count_plugins()
   return #files
 end
 
-vim.keymap.set("n", "<Leader>pc", function()
+vim.keymap.set("n", "<Leader>uc", function()
   vim.notify("Plugins: " .. count_plugins(), vim.log.levels.INFO)
 end, { desc = "Plugin count" })
 

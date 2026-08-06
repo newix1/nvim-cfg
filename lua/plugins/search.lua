@@ -62,28 +62,28 @@ map("n", "<Leader>fa",
   end,
   { desc = "Find in config" })
 
-vim.pack.add({ 'https://github.com/dmtrKovalenko/fff.nvim' })
-
-vim.api.nvim_create_autocmd('PackChanged', {
-  callback = function(ev)
-    local name, kind = ev.data.spec.name, ev.data.kind
-    if name == 'fff.nvim' and (kind == 'install' or kind == 'update') then
-      if not ev.data.active then vim.cmd.packadd('fff.nvim') end
-      require('fff.download').download_or_build_binary()
-    end
-  end,
-})
-
-
-local fff = require("fff")
-
-fff.setup ({
-  layout ={
-    prompt_position = 'top',
-    width = 0.6,
-    height = 0.6
-  }
-})
+-- vim.pack.add({ 'https://github.com/dmtrKovalenko/fff.nvim' })
+--
+-- vim.api.nvim_create_autocmd('PackChanged', {
+--   callback = function(ev)
+--     local name, kind = ev.data.spec.name, ev.data.kind
+--     if name == 'fff.nvim' and (kind == 'install' or kind == 'update') then
+--       if not ev.data.active then vim.cmd.packadd('fff.nvim') end
+--       require('fff.download').download_or_build_binary()
+--     end
+--   end,
+-- })
+--
+--
+-- local fff = require("fff")
+--
+-- fff.setup ({
+--   layout ={
+--     prompt_position = 'top',
+--     width = 0.6,
+--     height = 0.6
+--   }
+-- })
 
 -- -- Поиск файлов
 -- map("n", "<Leader><Leader>", function()
